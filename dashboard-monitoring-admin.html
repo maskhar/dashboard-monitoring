@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dashboard Monitoring Admin Utero Indonesia</title>
+<style>
+:root{--bg:#f6f5f1;--sf:#fff;--tx:#1d1d1b;--mu:#6b6a64;--bd:#e2e0d8;--ac:#d9480f;--ok:#2f9e44;--wn:#e8a317;--er:#c92a2a;--tr:#ebe9e1;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171716;--sf:#222220;--tx:#f0efe9;--mu:#a09f97;--bd:#3a3935;--ac:#ff8a4c;--ok:#51cf66;--wn:#fcc419;--er:#ff6b6b;--tr:#33322e}}
+:root[data-theme="dark"]{--bg:#171716;--sf:#222220;--tx:#f0efe9;--mu:#a09f97;--bd:#3a3935;--ac:#ff8a4c;--ok:#51cf66;--wn:#fcc419;--er:#ff6b6b;--tr:#33322e}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.w{max-width:1100px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:0}h2{font-size:15px;margin:0 0 10px}
+.sub{color:var(--mu);font-size:13px}
+.hd{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tabs button,.sel button{border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:7px 12px;border-radius:8px;cursor:pointer;font:inherit}
+.tabs button.on,.sel button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:14px}
+.c{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px}
+.k{font-size:24px;font-weight:700}.l{color:var(--mu);font-size:12px}
+.bar{height:8px;background:var(--tr);border-radius:4px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--ac)}
+.sc{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:640px}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--bd);vertical-align:top}
+th{font-size:12px;color:var(--mu);font-weight:600}
+input,select,textarea{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:4px 6px}
+input[type=number]{width:90px}input[type=text]{width:100%;min-width:120px}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;color:#fff}
+.ok{background:var(--ok)}.wn{background:var(--wn);color:#222}.er{background:var(--er)}.mu{background:var(--mu)}
+.sel{display:flex;gap:6px;margin-bottom:10px}
+.hide{display:none}.note{background:var(--tr);border-radius:8px;padding:10px;font-size:13px;margin-bottom:12px}
+</style></head><body><div class="w">
+<div class="hd"><div><h1>Dashboard Monitoring Admin Operasional</h1>
+<div class="sub">Utero Indonesia · Periode 2 Nov 2026 – 31 Jan 2027 · Lapor ke Manajer Operasional</div></div>
+<div class="sub" id="today"></div></div>
+<div class="tabs" id="tabs"></div>
+<div id="v"></div>
+<p class="sub">Data target diambil dari file Excel. Isian aktual, progres, dan status tersimpan di browser ini saja. Kosong berarti belum dilaporkan, bukan nol. Nilai PO, omzet, dan kas dicatat terpisah.</p>
+</div>
+<script>
+var M=["Nov 2026","Des 2026","Jan 2027"];
+var KPI=[["Prospek baru",[25,30,35]],["Percakapan kebutuhan",[8,10,12]],["Proposal terkirim",[4,5,6]],["Pelanggan baru",[1,2,3]],["Pertemuan kebutuhan",[3,4,5]],["Pengajuan mitra",[1,2,3]],["Diskusi kontrak",[0,1,2]],["Materi penjualan",[2,3,4]],["Pendapatan contoh",[50000000,75000000,100000000]]];
+var WK=[["Fokus demo minggu 1","Deliverable contoh minggu 1","Catatan review contoh minggu 1"],["Fokus demo minggu 2","Deliverable contoh minggu 2","Catatan review contoh minggu 2"],["Fokus demo minggu 3","Deliverable contoh minggu 3","Catatan review contoh minggu 3"],["Fokus demo minggu 4","Deliverable contoh minggu 4","Catatan review contoh minggu 4"],["Fokus demo minggu 5","Deliverable contoh minggu 5","Catatan review contoh minggu 5"],["Fokus demo minggu 6","Deliverable contoh minggu 6","Catatan review contoh minggu 6"],["Fokus demo minggu 7","Deliverable contoh minggu 7","Catatan review contoh minggu 7"],["Fokus demo minggu 8","Deliverable contoh minggu 8","Catatan review contoh minggu 8"],["Fokus demo minggu 9","Deliverable contoh minggu 9","Catatan review contoh minggu 9"],["Fokus demo minggu 10","Deliverable contoh minggu 10","Catatan review contoh minggu 10"],["Fokus demo minggu 11","Deliverable contoh minggu 11","Catatan review contoh minggu 11"],["Fokus demo minggu 12","Deliverable contoh minggu 12","Catatan review contoh minggu 12"],["Fokus demo minggu 13","Deliverable contoh minggu 13","Catatan review contoh minggu 13"]];
+var DY=[[46328,"Milestone demo 1","Bukti penyelesaian contoh 1"],[46329,"Milestone demo 2","Bukti penyelesaian contoh 2"],[46330,"Milestone demo 3","Bukti penyelesaian contoh 3"],[46331,"Milestone demo 4","Bukti penyelesaian contoh 4"],[46332,"Milestone demo 5","Bukti penyelesaian contoh 5"],[46335,"Milestone demo 6","Bukti penyelesaian contoh 6"],[46336,"Milestone demo 7","Bukti penyelesaian contoh 7"],[46337,"Milestone demo 8","Bukti penyelesaian contoh 8"],[46338,"Milestone demo 9","Bukti penyelesaian contoh 9"],[46339,"Milestone demo 10","Bukti penyelesaian contoh 10"],[46342,"Milestone demo 11","Bukti penyelesaian contoh 11"],[46343,"Milestone demo 12","Bukti penyelesaian contoh 12"],[46344,"Milestone demo 13","Bukti penyelesaian contoh 13"],[46345,"Milestone demo 14","Bukti penyelesaian contoh 14"],[46346,"Milestone demo 15","Bukti penyelesaian contoh 15"],[46349,"Milestone demo 16","Bukti penyelesaian contoh 16"],[46350,"Milestone demo 17","Bukti penyelesaian contoh 17"],[46351,"Milestone demo 18","Bukti penyelesaian contoh 18"],[46352,"Milestone demo 19","Bukti penyelesaian contoh 19"],[46353,"Milestone demo 20","Bukti penyelesaian contoh 20"]];
+var GATE=["Validasi pengetahuan dasar","Simulasi alur kerja","Review hasil contoh","Presentasi ringkasan","Persetujuan kelulusan demo"];
+var ST=["Belum mulai","Berjalan","Selesai","Terlambat"],SC={"Belum mulai":"mu","Berjalan":"wn","Selesai":"ok","Terlambat":"er"};
+var S={a:{},w:{},d:{},g:{}},tab="ring",mo=0;
+try{var x=localStorage.getItem("utero_admin");if(x)S=JSON.parse(x)}catch(e){}
+function sv(){try{localStorage.setItem("utero_admin",JSON.stringify(S))}catch(e){}}
+function dt(s){return new Date((s-25569)*864e5)}
+function fd(s){return dt(s).toLocaleDateString("id-ID",{day:"numeric",month:"short",timeZone:"UTC"})}
+var now=new Date(),ts=Math.floor((Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()))/864e5)+25569;
+function rp(n){return "Rp "+n.toLocaleString("id-ID")}
+function pc(i,m){var t=KPI[i][1][m],v=S.a[i+"-"+m];if(v===undefined||v===""||!t)return null;return Math.round(v/t*100)}
+function wst(i){var w=S.w[i]||{},s=w.s||"Belum mulai";var dl=46332+7*i;if(s!="Selesai"&&ts>dl)s="Terlambat";return s}
+function tg(s){return '<span class="tag '+SC[s]+'">'+s+'</span>'}
+function bar(p,c){return '<div class="bar"><i style="width:'+Math.min(p,100)+'%;'+(c?'background:'+c:'')+'"></i></div>'}
+function R(){
+ document.getElementById("tabs").innerHTML=[["ring","Ringkasan"],["kpi","Target KPI"],["wk","Timeline 13 Minggu"],["dy","20 Hari Pertama"]].map(function(t){return '<button class="'+(tab==t[0]?"on":"")+'" onclick="tab=\''+t[0]+'\';R()">'+t[1]+'</button>'}).join("");
+ document.getElementById("v").innerHTML=({ring:ring,kpi:kpi,wk:wk,dy:dy})[tab]();
+}
+function ring(){
+ var wd=0,dd=0,gd=0;WK.forEach(function(_,i){if((S.w[i]||{}).s=="Selesai")wd++});DY.forEach(function(_,i){if((S.d[i]||{}).k)dd++});GATE.forEach(function(_,i){if(S.g[i])gd++});
+ var late=WK.filter(function(_,i){return wst(i)=="Terlambat"}).length;
+ var cw=Math.floor((ts-46328)/7)+1,info=ts<46328?"Mulai 2 Nov 2026 (H-"+(46328-ts)+")":(ts>46416?"Periode selesai":"Minggu ke-"+cw+" dari 13");
+ var h='<div class="g"><div class="c"><div class="l">Posisi periode</div><div class="k" style="font-size:18px">'+info+'</div></div>'
+ +'<div class="c"><div class="l">Minggu selesai</div><div class="k">'+wd+'/13</div>'+bar(wd/13*100)+'</div>'
+ +'<div class="c"><div class="l">Hari pertama selesai</div><div class="k">'+dd+'/20</div>'+bar(dd/20*100)+'</div>'
+ +'<div class="c"><div class="l">Syarat kelulusan fase</div><div class="k">'+gd+'/5</div>'+bar(gd/5*100,'var(--ok)')+'</div>'
+ +'<div class="c"><div class="l">Minggu terlambat</div><div class="k" style="color:'+(late?'var(--er)':'inherit')+'">'+late+'</div></div></div>';
+ h+='<div class="c" style="margin-bottom:14px"><h2>Capaian KPI per bulan (indikator admin)</h2>';
+ M.forEach(function(m,j){var s=0,n=0;KPI.slice(0,8).forEach(function(k,i){var p=pc(i,j);if(p!==null){s+=Math.min(p,100);n++}});
+  h+='<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between"><b>'+m+'</b><span class="sub">'+(n?Math.round(s/n)+'% rata-rata · '+n+'/8 indikator terisi':'Belum dilaporkan')+'</span></div>'+bar(n?s/n:0)+'</div>'});
+ h+='</div><div class="c"><h2>Syarat kelulusan fase penjualan</h2>'+GATE.map(function(g,i){return '<label style="display:block;padding:3px 0"><input type="checkbox" '+(S.g[i]?"checked":"")+' onchange="S.g['+i+']=this.checked;sv();R()"> '+g+'</label>'}).join("")+'<div class="sub" style="margin-top:6px">Pengadaan mandiri dimulai setelah fase penjualan dinyatakan lulus.</div></div>';
+ return h}
+function kpi(){
+ var h='<div class="sel">'+M.map(function(m,j){return '<button class="'+(mo==j?"on":"")+'" onclick="mo='+j+';R()">'+m+'</button>'}).join("")+'</div><div class="c sc"><table><tr><th>Indikator</th><th>Target</th><th>Aktual</th><th>Capaian</th><th>Bukti / evaluasi</th></tr>';
+ KPI.forEach(function(k,i){var t=k[1][mo],p=pc(i,mo),key=i+"-"+mo,om=i==8;
+  h+='<tr><td>'+k[0]+(om?'<div class="sub">Target bersama Founder dan Manajer</div>':'')+'</td><td>'+(om?rp(t):t)+'</td><td><input type="number" min="0" value="'+(S.a[key]===undefined?"":S.a[key])+'" onchange="S.a[\''+key+'\']=this.value===\'\'?undefined:+this.value;sv();R()"></td><td>'+(p===null?'<span class="sub">'+(t?'Belum dilaporkan':'—')+'</span>':'<b>'+p+'%</b>'+bar(p,p>=100?'var(--ok)':p>=60?'var(--wn)':'var(--er)'))+'</td><td><input type="text" value="'+(S.a["n"+key]||"")+'" placeholder="Tautan/catatan bukti" onchange="S.a[\'n'+key+'\']=this.value;sv()"></td></tr>'});
+ return h+'</table></div>'}
+function wk(){
+ var h='<div class="c sc"><table><tr><th>ID</th><th>Minggu</th><th>Fokus dan deliverable</th><th>Progres</th><th>Status</th><th>Review Manajer / next action</th></tr>';
+ WK.forEach(function(w,i){var o=S.w[i]||{},s=wst(i);
+  h+='<tr><td>AO-'+String(i+1).padStart(3,"0")+'</td><td>'+(i+1)+'<div class="sub">'+fd(46328+7*i)+'–'+fd(46332+7*i)+'</div></td><td><b>'+w[0]+'</b><div class="sub">'+w[1]+'</div></td><td><input type="number" min="0" max="100" value="'+(o.p||0)+'" style="width:64px" onchange="S.w['+i+']=Object.assign(S.w['+i+']||{},{p:Math.min(100,Math.max(0,+this.value))});sv();R()">%'+bar(o.p||0)+'</td><td>'+tg(s)+'<br><select onchange="S.w['+i+']=Object.assign(S.w['+i+']||{},{s:this.value});sv();R()">'+ST.slice(0,3).map(function(x){return '<option'+(x==(o.s||"Belum mulai")?" selected":"")+'>'+x+'</option>'}).join("")+'</select></td><td><div class="sub">'+w[2]+'</div><input type="text" value="'+(o.n||"")+'" placeholder="Catatan/bukti" onchange="S.w['+i+']=Object.assign(S.w['+i+']||{},{n:this.value});sv()"></td></tr>'});
+ return h+'</table></div>'}
+function dy(){
+ var h='<div class="c sc"><table><tr><th>Selesai</th><th>Hari</th><th>Tanggal</th><th>Fokus</th><th>Bukti hasil</th><th>Catatan mentor</th></tr>';
+ DY.forEach(function(d,i){var o=S.d[i]||{},late=!o.k&&ts>d[0];
+  h+='<tr><td><input type="checkbox" '+(o.k?"checked":"")+' onchange="S.d['+i+']=Object.assign(S.d['+i+']||{},{k:this.checked});sv();R()"></td><td>'+(i+1)+'</td><td>'+fd(d[0])+(late?' '+tg("Terlambat"):'')+'</td><td>'+d[1]+'</td><td class="sub">'+d[2]+'</td><td><input type="text" value="'+(o.n||"")+'" onchange="S.d['+i+']=Object.assign(S.d['+i+']||{},{n:this.value});sv()"></td></tr>'});
+ return h+'</table></div>'}
+document.getElementById("today").textContent=now.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+R();
+</script></body></html>

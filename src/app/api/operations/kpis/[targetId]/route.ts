@@ -1,0 +1,6 @@
+import { z } from "zod";
+import { apiError, requireUser } from "@/lib/server/authz";
+import { changeOperationLifecycle, updateKpi } from "@/lib/server/operations";
+const schema = z.object({ actual: z.number().finite().nonnegative().nullable(), evaluation: z.string().max(4000).nullable().optional(), version: z.number().int().positive().optional() });
+export async function PATCH(request: Request, context: { params: Promise<{ targetId: string }> }) { try { const actor = await requireUser(); const { targetId } = await context.params; const body = await request.json(); const action = typeof body === "object" && body !== null && "action" in body; return Response.json(action ? await changeOperationLifecycle(actor, "KPI_TARGET", targetId, z.object({ action: z.enum(["archive", "restore"]) }).parse(body).action) : await updateKpi(actor, targetId, schema.parse(body))); } catch (error) { return apiError(error); } }
+export async function DELETE(_request: Request, context: { params: Promise<{ targetId: string }> }) { try { const actor = await requireUser(["ADMIN"]); const { targetId } = await context.params; return Response.json(await changeOperationLifecycle(actor, "KPI_TARGET", targetId, "delete")); } catch (error) { return apiError(error); } }

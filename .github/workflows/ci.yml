@@ -1,0 +1,37 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan repository secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm audit --omit=dev --audit-level=high
+      - name: Validate production Compose
+        env:
+          POSTGRES_DB: ci_dashboard
+          POSTGRES_USER: ci_user
+          POSTGRES_PASSWORD: ci-password-not-used
+          AUTH_SECRET: ci-auth-secret-ci-auth-secret-0001
+        run: docker compose -f compose.yaml config --quiet
+      - run: npm run build
+      - name: Build production container
+        run: docker build --target runner --build-arg APP_VERSION=${{ github.ref_name }} --build-arg BUILD_REVISION=${{ github.sha }} -t dashboard-monitoring:ci .

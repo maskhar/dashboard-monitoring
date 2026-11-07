@@ -1,0 +1,5 @@
+import { and, desc, eq, lt } from "drizzle-orm";
+import { db } from "@/db";
+import { auditEvents, users } from "@/db/schema";
+import { apiError, requireUser } from "@/lib/server/authz";
+export async function GET(request: Request) { try { await requireUser(["ADMIN"]); const p = new URL(request.url).searchParams; const filters = []; if (p.get("entityType")) filters.push(eq(auditEvents.entityType, p.get("entityType")!)); if (p.get("before")) filters.push(lt(auditEvents.createdAt, new Date(p.get("before")!))); return Response.json({ data: await db.select({ id: auditEvents.id, actorId: auditEvents.actorId, actorName: users.name, action: auditEvents.action, entityType: auditEvents.entityType, entityId: auditEvents.entityId, result: auditEvents.result, correlationId: auditEvents.correlationId, changes: auditEvents.changes, metadata: auditEvents.metadata, createdAt: auditEvents.createdAt }).from(auditEvents).leftJoin(users, eq(auditEvents.actorId, users.id)).where(filters.length ? and(...filters) : undefined).orderBy(desc(auditEvents.createdAt)).limit(Math.min(Math.max(Number(p.get("limit") ?? 50), 1), 100)) }); } catch (e) { return apiError(e); } }

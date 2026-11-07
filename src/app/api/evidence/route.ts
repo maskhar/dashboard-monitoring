@@ -1,0 +1,5 @@
+import { apiError, requireUser } from "@/lib/server/authz";
+import { listEvidence, saveEvidence } from "@/lib/server/evidence";
+export const runtime = "nodejs";
+export async function GET(request: Request) { try { const actor = await requireUser(); const params = new URL(request.url).searchParams; return Response.json({ data: await listEvidence(actor, params.get("entityType") ?? "", params.get("entityId") ?? "") }); } catch (error) { return apiError(error); } }
+export async function POST(request: Request) { try { const actor = await requireUser(); const contentLength = request.headers.get("content-length"); if (contentLength && Number(contentLength) > 12 * 1024 * 1024) return Response.json({ error: "Evidence request exceeds size limit" }, { status: 413 }); const form = await request.formData(); const file = form.get("file"); if (!(file instanceof File)) return Response.json({ error: "file is required" }, { status: 400 }); return Response.json(await saveEvidence(actor, file, String(form.get("entityType") ?? ""), String(form.get("entityId") ?? "")), { status: 201 }); } catch (e) { return apiError(e); } }
