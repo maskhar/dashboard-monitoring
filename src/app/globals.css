@@ -224,7 +224,29 @@ tbody tr:hover .action-cell { background: color-mix(in srgb, var(--primary) 3%, 
 .project-search-input { width: 100%; min-height: 44px; border: 1px solid var(--border); border-radius: 8px; padding: 0 11px; color: var(--text); background: var(--bg); font: inherit; }
 .project-search-input::placeholder { color: var(--muted); }
 .tasks-table .progress-cell { min-width: 0; }
-@media (max-width: 700px) { .tasks-table { min-width: 1080px; }.tasks-table th, .tasks-table td { padding: 10px; } }
+@media (max-width: 700px) {
+  .tasks-panel { overflow: visible; border: 0; background: transparent; }
+  .tasks-panel .table-scroll { overflow: visible; }
+  .tasks-table { min-width: 0; display: block; }
+  .tasks-table thead { display: none; }
+  .tasks-table tbody { display: grid; gap: 12px; }
+  .tasks-table .task-row { overflow: hidden; display: grid; border: 1px solid var(--border); border-radius: 14px; background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 96%, var(--primary) 4%), var(--surface)); box-shadow: 0 10px 28px rgba(0,0,0,.08); }
+  .tasks-table .task-row td { width: auto; min-height: 0; padding: 12px 14px; border-bottom: 1px solid var(--border); display: grid; gap: 7px; white-space: normal; background: transparent; box-shadow: none; }
+  .tasks-table .task-row td::before { content: attr(data-label); color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .tasks-table .task-row td:last-child { border-bottom: 0; }
+  .tasks-table .task-row .selection-cell { min-height: 44px; display: flex; align-items: center; justify-content: space-between; }
+  .tasks-table .task-row .selection-cell::before { content: "Pilih tugas"; }
+  .tasks-table .task-row .selection-cell input { width: 20px; height: 20px; }
+  .tasks-table .task-identity-cell { padding-top: 16px; }
+  .tasks-table .task-editor-stack textarea { min-height: 82px; }
+  .tasks-table .task-row :is(input, select, textarea, .project-search-input) { width: 100%; min-height: 44px; }
+  .tasks-table .task-progress-cell .progress-cell { min-width: 0; grid-template-columns: 64px 28px minmax(0, 1fr); }
+  .tasks-table .task-progress-cell .progress-cell input { width: 64px; }
+  .tasks-table .action-cell { position: static; }
+  .tasks-table .action-cell .row-management { justify-content: flex-start; }
+  .tasks-table .action-cell .row-actions-trigger { width: 44px; height: 44px; margin-left: auto; }
+  .tasks-table .action-cell .secondary-button, .tasks-table .action-cell .primary-button { min-height: 44px; }
+}
 
 /* Mobile project cards */
 .projects-mobile-list { display: none; }

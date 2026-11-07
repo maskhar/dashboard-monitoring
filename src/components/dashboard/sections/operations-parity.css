@@ -34,4 +34,26 @@
 @keyframes evidence-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .ops-parity .evidence-spinner { animation: none; } }
 @media (max-width: 1000px) { .ops-parity .ops-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 700px) { .ops-summary-head { align-items: start; flex-direction: column; } .ops-parity .ops-summary, .ops-parity .ops-fields { grid-template-columns: 1fr; } .ops-parity .timeline-title { flex-wrap: wrap; } }
+@media (max-width: 700px) {
+  .ops-summary-head { align-items: start; flex-direction: column; }
+  .ops-parity .ops-summary, .ops-parity .ops-fields { grid-template-columns: 1fr; }
+  .ops-parity .timeline-title { flex-wrap: wrap; }
+  .ops-parity .kpi-panel { overflow: visible; border: 0; background: transparent; }
+  .ops-parity .kpi-panel > .panel-head { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 14px; display: grid; gap: 14px; background: var(--surface); }
+  .ops-parity .kpi-panel .ops-month { width: 100%; }
+  .ops-parity .kpi-panel .ops-month select { min-height: 44px; }
+  .ops-parity .kpi-panel > .panel { margin-bottom: 12px; border-radius: 14px; }
+  .ops-parity .kpi-panel .table-scroll { overflow: visible; }
+  .ops-parity .kpi-table, .ops-parity .kpi-table tbody { display: grid; gap: 12px; }
+  .ops-parity .kpi-table thead { display: none; }
+  .ops-parity .kpi-table tr { overflow: hidden; display: grid; border: 1px solid var(--border); border-radius: 14px; background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 96%, var(--primary) 4%), var(--surface)); box-shadow: 0 10px 28px rgba(0,0,0,.08); }
+  .ops-parity .kpi-table td { width: auto; min-width: 0; max-width: none; padding: 13px 14px; border-bottom: 1px solid var(--border); display: grid; gap: 8px; white-space: normal; }
+  .ops-parity .kpi-table td::before { content: attr(data-label); color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .ops-parity .kpi-table td:last-child { border-bottom: 0; }
+  .ops-parity .kpi-table .ops-copy { min-width: 0; padding-top: 16px; }
+  .ops-parity .kpi-table .ops-note, .ops-parity .kpi-table .ops-kpi-input, .ops-parity .kpi-table .evidence-control { width: 100%; min-width: 0; }
+  .ops-parity .kpi-table :is(input, select, textarea, button, .evidence-button) { min-height: 44px; }
+  .ops-parity .kpi-table .attainment { min-width: 0; grid-template-columns: 48px minmax(0, 1fr); }
+  .ops-parity .kpi-table .ops-actions { align-items: stretch; display: grid; grid-template-columns: 1fr; }
+  .ops-parity .kpi-table .ops-actions > *, .ops-parity .kpi-table .row-management, .ops-parity .kpi-table .row-management button { width: 100%; }
+}
