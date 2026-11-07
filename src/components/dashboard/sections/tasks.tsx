@@ -1,8 +1,9 @@
 "use client";
 
-import { Archive, Check, Eye, MoreHorizontal, Plus, RotateCcw, Trash2, X } from "lucide-react";
+import { Archive, Check, Eye, Plus, RotateCcw, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AttachmentsPanel } from "./attachments";
+import { RowActionsMenu } from "./row-actions-menu";
 import { displayStatus, formatDate, PageHeading, Progress, readJson, workApiStatus, type Project, type Task, type User, type Viewer } from "./common";
 
 type TaskView = "active" | "archived" | "deleted";
@@ -38,7 +39,7 @@ function TaskRow({ task, viewer, view, projects, staff, busy, save, manage, open
     <td>{admin && active ? <select aria-label={`PIC ${task.title}`} value={draft.assigneeId} disabled={busy} onChange={(event) => setDraft({ ...draft, assigneeId: event.target.value })}><option value="">Belum ditugaskan</option>{staff.map((user) => <option key={user.id} value={user.id}>{user.name}</option>)}</select> : <span>{task.assignee?.name ?? "Belum ditugaskan"}</span>}</td>
     <td><select aria-label={`Status ${task.title}`} value={displayStatus(draft.status)} disabled={controlDisabled} onChange={(event) => { const status = workApiStatus[event.target.value]; setDraft({ ...draft, status, progress: status === "COMPLETED" ? 100 : status === "NOT_STARTED" ? 0 : draft.progress === 100 ? 0 : draft.progress }); }}>{Object.keys(workApiStatus).map((status) => <option key={status}>{status}</option>)}</select></td>
     <td><div className="progress-cell"><input aria-label={`Progres ${task.title}`} type="number" min="0" max="100" step="5" value={draft.progress} disabled={controlDisabled} onChange={(event) => { const progress = Math.min(100, Math.max(0, Number(event.target.value))); setDraft({ ...draft, progress, status: progress === 100 ? "COMPLETED" : progress === 0 && draft.status === "COMPLETED" ? "NOT_STARTED" : progress > 0 && draft.status === "NOT_STARTED" ? "IN_PROGRESS" : draft.status }); }} /><span>%</span><Progress value={draft.progress} /></div></td>
-    <td className="action-cell"><div className="row-management"><button type="button" className="secondary-button compact" onClick={() => openDetail(task)}><Eye size={15} aria-hidden="true" /> Detail</button>{dirty && active ? <button type="button" className="primary-button compact save-row" disabled={busy || !draft.title.trim()} onClick={() => void save(task, draft)}><Check size={15} /> Simpan</button> : null}{admin ? <details className="row-actions-menu"><summary aria-label={`Aksi tugas ${task.title}`}><MoreHorizontal size={18} /></summary><div>{active ? <><button type="button" disabled={busy} onClick={() => void manage(task, "archive")}><Archive size={15} /> Arsipkan</button><button type="button" className="danger-text" disabled={busy} onClick={() => void manage(task, "delete")}><Trash2 size={15} /> Hapus</button></> : <button type="button" disabled={busy} onClick={() => void manage(task, "restore")}><RotateCcw size={15} /> Pulihkan</button>}</div></details> : null}</div></td>
+    <td className="action-cell"><div className="row-management"><button type="button" className="secondary-button compact" onClick={() => openDetail(task)}><Eye size={15} aria-hidden="true" /> Detail</button>{dirty && active ? <button type="button" className="primary-button compact save-row" disabled={busy || !draft.title.trim()} onClick={() => void save(task, draft)}><Check size={15} /> Simpan</button> : null}{admin ? <RowActionsMenu label={`Aksi tugas ${task.title}`}>{active ? <><button type="button" role="menuitem" disabled={busy} onClick={() => void manage(task, "archive")}><Archive size={15} /> Arsipkan</button><button type="button" role="menuitem" className="danger-text" disabled={busy} onClick={() => void manage(task, "delete")}><Trash2 size={15} /> Hapus</button></> : <button type="button" role="menuitem" disabled={busy} onClick={() => void manage(task, "restore")}><RotateCcw size={15} /> Pulihkan</button>}</RowActionsMenu> : null}</div></td>
   </tr>;
 }
 
@@ -97,6 +98,3 @@ export function TasksSection({ viewer, projects, users, setMessage, setError }: 
     <div className="data-panel"><div className="table-scroll"><table className="projects-table"><thead><tr>{admin ? <th className="selection-cell"><input type="checkbox" aria-label="Pilih semua tugas" checked={tasks.length > 0 && tasks.every((task) => selectedIds.includes(task.id))} disabled={!tasks.length || bulkBusy} onChange={() => setSelectedIds(tasks.every((task) => selectedIds.includes(task.id)) ? [] : tasks.map((task) => task.id))} /></th> : null}<th>Tugas</th><th>Proyek</th><th>Deadline</th><th>PIC</th><th>Status</th><th>Progres</th><th>Aksi</th></tr></thead><tbody>{tasks.map((task) => <TaskRow key={`${task.id}:${task.version}:${view}`} task={task} viewer={viewer} view={view} projects={projects} staff={staff} busy={busyId === task.id || bulkBusy} save={saveTask} manage={manage} openDetail={setSelectedTask} selected={selectedIds.includes(task.id)} toggle={toggleSelected} />)}{tasks.length === 0 ? <tr><td colSpan={admin ? 8 : 7}>{loading ? "Memuat tugas..." : "Belum ada tugas pada tampilan ini."}</td></tr> : null}</tbody></table></div></div>
   </>;
 }
-
-
-
