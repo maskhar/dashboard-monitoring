@@ -111,7 +111,7 @@ export function DashboardShell({ viewer }: { viewer: Viewer }) {
         {!loading && section === "tasks" ? <TasksSection viewer={viewer} projects={projects} users={users} setMessage={setMessage} setError={setError} /> : null}
         {!loading && section === "operations" ? <OperationsSection viewer={viewer} data={operations} users={users} reload={loadAll} setMessage={setMessage} setError={setError} /> : null}
         {!loading && section === "approvals" ? <ApprovalsSection viewer={viewer} items={approvals} reload={loadAll} setMessage={setMessage} setError={setError} /> : null}
-        {!loading && section === "users" && isAdmin ? <UserManagementSection users={users} reload={loadAll} setMessage={setMessage} setError={setError} /> : null}
+        {!loading && section === "users" && isAdmin ? <UserManagementSection viewer={viewer} users={users} reload={loadAll} setMessage={setMessage} setError={setError} /> : null}
         {!loading && section === "audit" && isAdmin ? <AuditSection items={audit} /> : null}
       </div>
     </main>

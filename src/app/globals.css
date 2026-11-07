@@ -225,3 +225,58 @@ tbody tr:hover .action-cell { background: color-mix(in srgb, var(--primary) 3%, 
 .project-search-input::placeholder { color: var(--muted); }
 .tasks-table .progress-cell { min-width: 0; }
 @media (max-width: 700px) { .tasks-table { min-width: 1080px; }.tasks-table th, .tasks-table td { padding: 10px; } }
+
+/* Mobile project cards */
+.projects-mobile-list { display: none; }
+.danger-text { color: var(--red); }
+
+@media (max-width: 700px) {
+  .projects-desktop-panel { display: none; }
+  .projects-mobile-list { display: grid; gap: 12px; }
+  .project-mobile-card { position: relative; min-width: 0; overflow: hidden; padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 96%, var(--primary) 4%), var(--surface)); box-shadow: 0 10px 28px rgba(0,0,0,.08); }
+  .project-mobile-card.overdue { border-left: 4px solid var(--red); }
+  .project-mobile-card.quality { border-left: 4px solid var(--amber); }
+  .project-mobile-head { display: flex; align-items: flex-start; gap: 12px; }
+  .project-mobile-check { width: 20px; height: 20px; flex: none; margin-top: 2px; accent-color: var(--primary); }
+  .project-mobile-identity { min-width: 0; flex: 1; }
+  .project-mobile-identity > strong { display: block; overflow-wrap: anywhere; font: 700 19px/1.2 var(--font-display), serif; }
+  .project-mobile-identity > small { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+  .project-mobile-identity .project-flags { min-height: 0; margin-top: 9px; }
+  .project-mobile-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+  .project-mobile-meta > div, .project-mobile-meta > label, .project-mobile-progress, .project-mobile-note { min-width: 0; display: grid; gap: 6px; }
+  .project-mobile-meta span, .project-mobile-progress > span, .project-mobile-note > span { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .project-mobile-meta strong { overflow-wrap: anywhere; font-size: 13px; line-height: 1.4; }
+  .project-mobile-meta select, .project-mobile-progress input, .project-mobile-note input { width: 100%; min-height: 44px; border: 1px solid var(--border); border-radius: 9px; padding: 0 11px; color: var(--text); background: var(--bg); font: inherit; }
+  .project-mobile-progress, .project-mobile-note { margin-top: 14px; }
+  .project-mobile-progress > div { min-width: 0; display: grid; grid-template-columns: 64px 44px minmax(0, 1fr); align-items: center; gap: 8px; }
+  .project-mobile-progress input { font-weight: 800; text-align: center; }
+  .project-mobile-progress b { font-size: 12px; font-variant-numeric: tabular-nums; }
+  .project-mobile-actions { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .project-mobile-actions .primary-button, .project-mobile-actions .secondary-button, .project-mobile-actions .row-actions-trigger { min-height: 44px; }
+  .project-mobile-actions .row-actions-trigger { width: 44px; margin-left: auto; }
+}
+
+@media (max-width: 380px) {
+  .project-mobile-card { padding: 14px; }
+  .project-mobile-meta { grid-template-columns: 1fr; }
+  .project-mobile-progress > div { grid-template-columns: 58px 40px minmax(0, 1fr); }
+  .project-mobile-actions { align-items: stretch; flex-wrap: wrap; }
+  .project-mobile-actions .secondary-button, .project-mobile-actions .primary-button { flex: 1; }
+}
+
+/* User management */
+.users-table { min-width: 860px; }
+.users-table th:last-child, .users-table td:last-child { width: 210px; }
+.user-row-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.danger-button.compact { min-height: 38px; padding: 0 13px; font-size: 12px; }
+.dialog-backdrop { position: fixed; inset: 0; z-index: 1200; padding: 20px; display: grid; place-items: center; background: rgba(5,8,6,.72); backdrop-filter: blur(5px); }
+.user-editor { width: min(620px, 100%); max-height: calc(100vh - 40px); overflow: auto; padding: 20px; border: 1px solid var(--border); border-radius: 15px; color: var(--text); background: var(--surface); box-shadow: 0 30px 90px rgba(0,0,0,.42); }
+.user-editor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+@media (max-width: 700px) {
+  .dialog-backdrop { padding: 12px; align-items: end; }
+  .user-editor { max-height: calc(100dvh - 24px); padding: 16px; border-radius: 16px 16px 10px 10px; }
+  .user-editor-grid { grid-template-columns: 1fr; }
+  .user-editor-grid label.wide { grid-column: auto; }
+  .user-row-actions button { min-height: 44px; }
+}
