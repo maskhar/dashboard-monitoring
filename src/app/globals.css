@@ -196,10 +196,32 @@ tbody tr:hover .action-cell { background: color-mix(in srgb, var(--primary) 3%, 
 .row-actions-popover { width: 164px; padding: 6px; position: fixed; z-index: 1000; border: 1px solid var(--border); border-radius: 10px; display: grid; gap: 3px; color: var(--text); background: var(--surface); box-shadow: 0 18px 44px rgba(0,0,0,.38); }
 .row-actions-popover button { width: 100%; min-height: 40px; border: 0; border-radius: 7px; padding: 0 10px; display: flex; align-items: center; gap: 8px; color: var(--text); background: transparent; text-align: left; white-space: nowrap; }
 .row-actions-popover button:hover { background: var(--surface-2); }
-.row-actions-popover button.danger-text { color: var(--red); }.attachments-panel { margin-top: 16px; }
+.row-actions-popover button.danger-text { color: var(--red); }
+.attachments-panel { margin-top: 16px; }
 .attachment-link-form { display: grid; gap: 8px; }
 .attachment-link-form label { display: grid; gap: 6px; color: var(--muted); font-size: 11px; font-weight: 800; }
 .attachment-link-form input { width: 100%; min-height: 42px; border: 1px solid var(--border); border-radius: 8px; padding: 0 11px; color: var(--text); background: var(--bg); }
 .attachment-link-form input[aria-invalid="true"] { border-color: var(--red); }
 @media (max-width: 1024px) { .sync-status { display: none; } }
 @media (max-width: 560px) { .topbar { min-height: 64px; }.topbar-context span { display: none; }.topbar-leading { gap: 0; }.row-management { justify-content: flex-start; } }
+
+/* Task workspace */
+.sr-only { width: 1px; height: 1px; padding: 0; position: absolute; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.tasks-table { min-width: 1190px; table-layout: fixed; }
+.tasks-table th, .tasks-table td { padding: 12px; }
+.tasks-table .selection-cell { width: 44px; }
+.tasks-table .task-identity-cell { width: 250px; white-space: normal; }
+.tasks-table .task-project-cell { width: 190px; }
+.tasks-table .task-date-cell { width: 142px; }
+.tasks-table .task-pic-cell { width: 170px; }
+.tasks-table .task-status-cell { width: 142px; }
+.tasks-table .task-progress-cell { width: 184px; }
+.tasks-table .action-cell { width: 190px; }
+.task-row td { min-height: 76px; vertical-align: middle; }
+.task-editor-stack { display: grid; gap: 7px; }
+.task-editor-stack .inline-input, .task-editor-stack textarea, .tasks-table select, .tasks-table .project-search-input, .tasks-table .task-date-cell input { width: 100%; }
+.task-editor-stack textarea { min-height: 54px; border: 1px solid var(--border); border-radius: 8px; padding: 9px 10px; resize: vertical; color: var(--text); background: var(--surface); font: inherit; line-height: 1.4; }
+.project-search-input { width: 100%; min-height: 44px; border: 1px solid var(--border); border-radius: 8px; padding: 0 11px; color: var(--text); background: var(--bg); font: inherit; }
+.project-search-input::placeholder { color: var(--muted); }
+.tasks-table .progress-cell { min-width: 0; }
+@media (max-width: 700px) { .tasks-table { min-width: 1080px; }.tasks-table th, .tasks-table td { padding: 10px; } }
