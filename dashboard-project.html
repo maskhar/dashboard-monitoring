@@ -1,0 +1,678 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Ruang Proyek Utero</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: bengkel job-sheet — header proyek, jalur 6 fase, angka kunci, lalu tab kerja */
+:root{
+  --bg:#f3f4f1; --surface:#ffffff; --sunk:#e9ebe6; --line:#d5d9d2; --line-strong:#aeb5ab;
+  --ink:#1b2320; --ink-2:#4d5853; --ink-3:#7a847f;
+  --accent:#0d6b5b; --accent-soft:#d9ece7; --accent-ink:#ffffff;
+  --good:#1f7a3f; --good-soft:#dcefe2; --warn:#a15c00; --warn-soft:#f6e7cf; --crit:#b3261e; --crit-soft:#f7dcd9;
+  --mark:#f2c94c;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121614; --surface:#1a201d; --sunk:#222a26; --line:#2f3833; --line-strong:#4a5550;
+  --ink:#e8ece9; --ink-2:#b2bcb6; --ink-3:#808b85;
+  --accent:#4fbfa8; --accent-soft:#183a33; --accent-ink:#0b1412;
+  --good:#5cc07f; --good-soft:#173322; --warn:#e3a54a; --warn-soft:#3a2c14; --crit:#f07c73; --crit-soft:#3d1c1a;
+  --mark:#c9a43a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121614; --surface:#1a201d; --sunk:#222a26; --line:#2f3833; --line-strong:#4a5550;
+  --ink:#e8ece9; --ink-2:#b2bcb6; --ink-3:#808b85;
+  --accent:#4fbfa8; --accent-soft:#183a33; --accent-ink:#0b1412;
+  --good:#5cc07f; --good-soft:#173322; --warn:#e3a54a; --warn-soft:#3a2c14; --crit:#f07c73; --crit-soft:#3d1c1a;
+  --mark:#c9a43a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14.5px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 56px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--r);padding:7px 12px;font-weight:500;font-size:13.5px;white-space:nowrap}
+.btn:hover{border-color:var(--ink-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--crit);border-color:var(--crit)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--ink-2)}
+.btn.small{padding:4px 9px;font-size:12.5px}
+
+/* top bar */
+.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.brand h1{font-size:22px;font-weight:800}
+.brand span{color:var(--ink-3);font-size:13px}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.select{border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--r);padding:7px 10px;max-width:100%;min-width:0}
+.sync{font-size:12px;color:var(--ink-3)}
+.sync.err{color:var(--crit)}
+
+/* project header */
+.proj{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:end;padding:22px 0 18px}
+.proj-name{font-family:var(--f-display);font-weight:800;font-size:clamp(22px,3.4vw,32px);border:0;background:transparent;width:100%;padding:2px 0;border-bottom:1px dashed transparent}
+.proj-name:hover,.proj-name:focus{border-bottom-color:var(--line-strong);outline:none}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:8px}
+.meta label{display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--ink-3)}
+.meta input{border:0;border-bottom:1px solid var(--line);background:transparent;padding:2px 0;min-width:0;width:170px;color:var(--ink);font-size:14px}
+.meta input:focus{outline:none;border-bottom-color:var(--accent)}
+.phase-now{text-align:right}
+.phase-now strong{display:block;font-family:var(--f-display);font-size:18px}
+@media (max-width:640px){.proj{grid-template-columns:1fr}.phase-now{text-align:left}}
+
+/* phase rail */
+.rail{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.rail .ph{padding:10px 12px;border-right:1px solid var(--line);position:relative;min-width:0}
+.rail .ph:last-child{border-right:0}
+.rail .ph .t{font-size:12px;color:var(--ink-3)}
+.rail .ph .n{font-weight:600;font-size:13.5px;line-height:1.25}
+.rail .ph .g{margin-top:6px;font-size:11.5px;display:flex;gap:5px;align-items:center;color:var(--ink-3)}
+.rail .ph .dot{width:9px;height:9px;transform:rotate(45deg);border:1.5px solid var(--line-strong);flex:none}
+.rail .ph.done{background:var(--good-soft)}
+.rail .ph.done .dot{background:var(--good);border-color:var(--good)}
+.rail .ph.now{background:var(--accent-soft);box-shadow:inset 0 -3px 0 var(--accent)}
+.rail .ph.now .dot{border-color:var(--accent)}
+@media (max-width:760px){.rail{grid-template-columns:repeat(3,minmax(0,1fr))}.rail .ph:nth-child(3){border-right:0}.rail .ph:nth-child(-n+3){border-bottom:1px solid var(--line)}}
+
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:16px 0 20px}
+.kpi{padding:12px 14px;border-left:3px solid var(--line-strong);background:var(--surface);border-radius:0 var(--r) var(--r) 0;min-width:0}
+.kpi .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:19px;font-weight:500;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .s{font-size:12px;color:var(--ink-3)}
+.kpi.good{border-left-color:var(--good)} .kpi.warn{border-left-color:var(--warn)} .kpi.crit{border-left-color:var(--crit)}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.pill{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--sunk);color:var(--ink-2);white-space:nowrap}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.crit{background:var(--crit-soft);color:var(--crit)}
+.pill.acc{background:var(--accent-soft);color:var(--accent)}
+
+/* tabs */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tab{border:0;background:transparent;padding:10px 14px;font-weight:600;color:var(--ink-3);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.panel{padding-top:20px}
+
+.grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.card h3{font-size:15px;margin-bottom:10px}
+.hint{font-size:12.5px;color:var(--ink-3);margin:4px 0 0}
+
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);text-align:left;font-weight:600;padding:9px 8px;border-bottom:1px solid var(--line);background:var(--sunk);white-space:nowrap}
+td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+.cell{border:1px solid transparent;background:transparent;border-radius:4px;padding:5px 6px;width:100%;min-width:0}
+.cell:hover{border-color:var(--line)}
+.cell:focus{border-color:var(--accent);background:var(--bg);outline:none}
+.cell.r{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+tfoot td{font-weight:600;background:var(--sunk)}
+.over{color:var(--crit)} .under{color:var(--good)}
+
+/* pricing */
+.price-rows{display:grid;gap:0}
+.pr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);align-items:center}
+.pr:last-child{border-bottom:0}
+.pr .l{font-size:13.5px;color:var(--ink-2)}
+.pr .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.pr.total .l,.pr.total .v{font-weight:600;color:var(--ink)}
+.pr.big .v{font-size:18px}
+.inl{display:flex;align-items:center;gap:4px;justify-content:flex-end}
+.inl input{width:64px;text-align:right;border:1px solid var(--line);border-radius:4px;padding:3px 6px;background:var(--bg);font-family:var(--f-mono)}
+.inl input.wide{width:150px}
+.toggle{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink-2)}
+.verdict{margin-top:12px;padding:10px 12px;border-radius:var(--r);font-size:13.5px}
+.verdict.good{background:var(--good-soft);color:var(--good)} .verdict.warn{background:var(--warn-soft);color:var(--warn)} .verdict.crit{background:var(--crit-soft);color:var(--crit)}
+.formula{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);background:var(--sunk);padding:8px 10px;border-radius:4px;margin-top:12px;line-height:1.6}
+
+/* timeline */
+.track{position:relative;height:16px;min-width:220px;background:repeating-linear-gradient(90deg,transparent 0 calc(100%/7 - 1px),var(--line) calc(100%/7 - 1px) calc(100%/7))}
+.bar{position:absolute;top:2px;height:12px;border-radius:6px;background:var(--accent);opacity:.85}
+.bar.done{background:var(--good)} .bar.late{background:var(--crit)} .bar.plan{background:var(--line-strong)}
+.today{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--mark)}
+.fase-row td{background:var(--sunk);font-weight:600;font-size:12.5px;color:var(--ink-2)}
+.fase-row td .gate{font-weight:400;color:var(--ink-3);margin-left:8px}
+
+/* docs */
+.docs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.docs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.docs{grid-template-columns:1fr}}
+.doc-group .head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.doc-group h3{margin:0}
+.chk{display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.chk input{margin-top:3px;accent-color:var(--accent);width:16px;height:16px;flex:none}
+.chk.on span{color:var(--ink-3);text-decoration:line-through}
+
+/* team */
+.team{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 20px}
+@media (max-width:640px){.team{grid-template-columns:1fr}}
+.role{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.role label{font-weight:600;font-size:13.5px}
+.role small{display:block;font-weight:400;color:var(--ink-3);font-size:12px}
+.role input{border:1px solid var(--line);border-radius:4px;padding:6px 8px;background:var(--bg);min-width:0}
+.alert{padding:10px 12px;border-radius:var(--r);font-size:13.5px;margin-top:12px}
+.alert.warn{background:var(--warn-soft);color:var(--warn)}
+
+/* guide */
+.guide ol{margin:0;padding-left:20px}
+.guide li{margin:6px 0}
+.steps{display:grid;gap:10px}
+.step{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.step .no{font-family:var(--f-display);font-weight:800;font-size:22px;color:var(--accent)}
+.step h3{font-size:15px}
+.step p{margin:3px 0 0;color:var(--ink-2);font-size:13.5px}
+.step .gt{margin-top:6px;font-size:12.5px}
+a{color:var(--accent)}
+
+.empty{padding:48px 16px;text-align:center;color:var(--ink-2)}
+.empty h2{font-size:20px;margin-bottom:8px;color:var(--ink)}
+.notice{font-size:12.5px;padding:8px 12px;border-radius:var(--r);background:var(--warn-soft);color:var(--warn);margin-top:12px}
+.confirm{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--crit)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:13px;z-index:20}
+@media (prefers-reduced-motion:no-preference){.bar{transition:left .2s,width .2s}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>Ruang Proyek Utero</h1><span>Penawaran → SPK → Produksi → BAST → Pelunasan</span></div>
+    <div class="top-actions">
+      <label class="sr" for="projSel" hidden>Pilih proyek</label>
+      <select id="projSel" class="select" aria-label="Pilih proyek"></select>
+      <button class="btn primary" id="btnNew">+ Proyek baru</button>
+      <button class="btn" id="btnDup">Duplikat</button>
+      <span id="delZone"><button class="btn ghost" id="btnDel">Hapus</button></span>
+      <span class="sync" id="sync">Menghubungkan…</span>
+    </div>
+  </header>
+  <main id="app"><div class="empty"><h2>Memuat daftar proyek…</h2><p>Data proyek tim sedang diambil.</p></div></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+const SOP_URL = "https://claude.ai/artifact/DAJeKUzTrsSzD464ZtdeET";
+const KAT = ["Material rangka & panel","Finishing","Kelistrikan","Cetak & branding","Bahan pendukung","Tenaga kerja","Operasional","Pengiriman"];
+const ROLES = [
+  ["pic","PIC Proyek","Penawaran, negosiasi, SPK, BAST"],
+  ["asisten","Asisten PIC","Dokumen, foto progres, status harian"],
+  ["desainer","Desainer","Gambar penawaran & gambar kerja"],
+  ["pl","Project Leader","RAB final, belanja, produksi, QC"],
+  ["tukang","Tukang / tim produksi","Fabrikasi, finishing, pasang"],
+  ["keuangan","Admin Keuangan","Invoice, DP, pelunasan, laporan margin"],
+  ["pendamping","Tim pendamping","Bantu kirim dan instalasi"]
+];
+const FASE = [
+  {n:1,nama:"Penawaran",gate:"G1",gt:"Harga disetujui, margin di atas target",owner:"PIC Proyek"},
+  {n:2,nama:"Kontrak",gate:"G2",gt:"SPK ditandatangani dan DP masuk",owner:"Admin Keuangan"},
+  {n:3,nama:"Perencanaan",gate:"G3",gt:"Gambar kerja di-ACC, RAB final dikunci",owner:"Project Leader"},
+  {n:4,nama:"Produksi",gate:"G4",gt:"Lolos QC internal 100%",owner:"Project Leader"},
+  {n:5,nama:"Instalasi & serah terima",gate:"G5",gt:"BAST ditandatangani klien",owner:"PIC Proyek"},
+  {n:6,nama:"Penagihan & tutup buku",gate:"Tutup",gt:"Lunas, laporan margin dibahas",owner:"Admin Keuangan"}
+];
+const STAGES = [
+  [1,"Penawaran harga & BOQ","pic"],[1,"Negosiasi & persetujuan penawaran","pic"],
+  [2,"Penerbitan SPK / kontrak kerja","pic"],
+  [3,"Survei & pengukuran lokasi","pl"],[3,"Finalisasi & persetujuan gambar kerja","desainer"],[3,"Penyusunan anggaran & jadwal kerja","pl"],
+  [4,"Belanja material","pl"],[4,"Penerimaan & pengecekan material","pl"],[4,"Produksi","pl"],[4,"Quality Control internal","pl"],
+  [5,"Pengiriman","pl"],[5,"Pemasangan di lokasi","pl"],[5,"Pemeriksaan bersama klien","pic"],[5,"Perbaikan & finalisasi","pl"],[5,"Penandatanganan BAST","pic"],
+  [6,"Penagihan & pelunasan sesuai termin","keuangan"]
+];
+const DOCS = [
+  ["penawaran","Surat penawaran + BOQ + gambar konsep",1],["acc_penawaran","Persetujuan penawaran tertulis",1],
+  ["spk","SPK bertanda tangan + bukti DP",2],
+  ["survei","Form survei lokasi + foto",3],["gambar_acc","Gambar kerja ber-ACC klien",3],["rab_final","RAB final terkunci + jadwal kerja",3],
+  ["nota","Nota belanja + checklist penerimaan material",4],["qc","Checklist QC internal",4],
+  ["surat_jalan","Surat jalan",5],["punchlist","Punch list pemeriksaan bersama",5],["bast","BAST bertanda tangan + foto akhir",5],
+  ["invoice","Invoice pelunasan + bukti bayar",6],["laporan","Laporan margin aktual vs RAB",6]
+];
+const STATUS = ["Belum mulai","Proses","Selesai"];
+
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const rp = n => "Rp " + Math.round(Number(n)||0).toLocaleString("id-ID");
+const pct = n => (isFinite(n) ? n : 0).toLocaleString("id-ID",{maximumFractionDigits:1}) + "%";
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2));
+const num = v => { const x = parseFloat(String(v).replace(",", ".")); return isFinite(x) ? x : 0; };
+const todayISO = () => { const d = new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10); };
+
+function blankProject(){
+  return {
+    nama:"Proyek baru", klien:"", lokasi:"", jenis:"", tanggalDeal:"",
+    nilaiKontrak:0, targetMargin:25, retensiPct:5, overheadPct:0, kontinjensiPct:0, ppnOn:false, ppnPct:11, pphOn:false, pphPct:2,
+    items: KAT.map(k => ({id:uid(), kat:k, uraian:"", vol:1, sat:"lot", harga:0, realisasi:0})).slice(0,1),
+    team: {}, stages: STAGES.map(() => ({mulai:"", selesai:"", status:"Belum mulai", pic:""})), docs:{},
+    catatan:"", updatedAt: Date.now()
+  };
+}
+function normalize(p){
+  const b = blankProject();
+  const o = Object.assign({}, b, p || {});
+  o.items = Array.isArray(o.items) ? o.items.map(i => Object.assign({id:uid(),kat:KAT[0],uraian:"",vol:1,sat:"lot",harga:0,realisasi:0}, i)) : [];
+  o.stages = STAGES.map((_,i) => Object.assign({mulai:"",selesai:"",status:"Belum mulai",pic:""}, (o.stages||[])[i]||{}));
+  o.team = Object.assign({}, o.team||{}); o.docs = Object.assign({}, o.docs||{});
+  return o;
+}
+
+function calc(p){
+  const hpp = p.items.reduce((s,i)=>s+num(i.vol)*num(i.harga),0);
+  const real = p.items.reduce((s,i)=>s+num(i.realisasi),0);
+  const overhead = hpp*num(p.overheadPct)/100, kont = hpp*num(p.kontinjensiPct)/100;
+  const biaya = hpp+overhead+kont;
+  const denom = 1 - num(p.retensiPct)/100 - num(p.targetMargin)/100;
+  const hargaMin = denom>0 ? biaya/denom : NaN;
+  const kontrak = num(p.nilaiKontrak);
+  const retensi = kontrak*num(p.retensiPct)/100;
+  const margin = kontrak - biaya - retensi;
+  const marginPct = kontrak>0 ? margin/kontrak*100 : 0;
+  const ppn = p.ppnOn ? kontrak*num(p.ppnPct)/100 : 0;
+  const pph = p.pphOn ? kontrak*num(p.pphPct)/100 : 0;
+  const done = p.stages.filter(s=>s.status==="Selesai").length;
+  const t = todayISO();
+  const late = p.stages.filter(s=>s.selesai && s.selesai<t && s.status!=="Selesai").length;
+  const docsDone = DOCS.filter(d=>p.docs[d[0]]).length;
+  let faseNow = 7;
+  for(const f of FASE){ if(!DOCS.filter(d=>d[2]===f.n).every(d=>p.docs[d[0]])){ faseNow=f.n; break; } }
+  let mState = "crit";
+  if(kontrak>0 && marginPct>=num(p.targetMargin)) mState="good"; else if(kontrak>0 && margin>0) mState="warn";
+  return {hpp,real,overhead,kont,biaya,hargaMin,kontrak,retensi,margin,marginPct,ppn,pph,done,late,docsDone,faseNow,mState};
+}
+
+/* ---------- state ---------- */
+let db = null, mode = "loading";          // "db" | "local" | "loading"
+let projects = {};                        // id -> data
+let curId = null, cur = null, tab = "ringkasan";
+let dirty = false, saving = false, saveTimer = null, readOnly = false, confirmDel = false;
+try{ tab = localStorage.getItem("utero.tab") || "ringkasan"; }catch(e){}
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,2200); }
+function setSync(msg, err){ const s=$("#sync"); s.textContent=msg; s.classList.toggle("err",!!err); }
+
+/* ---------- persistence ---------- */
+function scheduleSave(){
+  if(!cur || readOnly) return;
+  dirty = true; cur.updatedAt = Date.now(); projects[curId] = cur;
+  setSync("Menyimpan…");
+  clearTimeout(saveTimer); saveTimer = setTimeout(flush, 800);
+}
+async function flush(){
+  if(saving){ saveTimer=setTimeout(flush,400); return; }
+  if(!dirty || !cur) return;
+  saving = true; dirty = false;
+  const id = curId, body = JSON.parse(JSON.stringify(cur));
+  try{
+    if(mode==="db"){ await db.collection("projects").doc(id).set(body); }
+    else { localStore(); }
+    setSync(mode==="db" ? "Tersimpan · semua tim melihat data ini" : "Tersimpan di browser ini");
+  }catch(e){
+    if(e && e.code==="invalid_argument"){ readOnly = true; setSync("Hanya-baca: Anda tidak punya akses ubah", true); }
+    else if(e && e.code==="quota_exceeded"){ setSync("Penyimpanan penuh, hapus proyek lama", true); }
+    else { dirty = true; setSync("Gagal menyimpan, mencoba lagi…", true); saveTimer=setTimeout(flush,2500); }
+  }finally{ saving = false; }
+}
+function localStore(){ try{ localStorage.setItem("utero.projects", JSON.stringify(projects)); }catch(e){} }
+function rememberCur(){ try{ localStorage.setItem("utero.cur", curId||""); }catch(e){} }
+
+async function start(){
+  try{ db = await window.claude?.use?.("db"); }catch(e){ db = null; }
+  if(!db){ startLocal(); return; }
+  mode = "db";
+  let first = true;
+  const timer = setTimeout(()=>{ if(first) setSync("Data belum terjangkau, menunggu…", true); }, 10000);
+  db.collection("projects").onSnapshot(snap => {
+    const next = {};
+    snap.docs.forEach(d => { next[d.id] = normalize(d.data()); });
+    if(!snap.metadata.fromCache){ clearTimeout(timer); }
+    // jangan timpa proyek yang sedang diedit
+    if(curId && (dirty || saving) && projects[curId]) next[curId] = projects[curId];
+    const curChangedRemotely = curId && next[curId] && !dirty && !saving && JSON.stringify(next[curId]) !== JSON.stringify(projects[curId]);
+    projects = next;
+    if(first){
+      first = false;
+      let saved = ""; try{ saved = localStorage.getItem("utero.cur")||""; }catch(e){}
+      curId = projects[saved] ? saved : (Object.keys(projects).sort((a,b)=>projects[b].updatedAt-projects[a].updatedAt)[0] || null);
+      cur = curId ? projects[curId] : null;
+      setSync(Object.keys(projects).length ? "Tersambung · data tim" : "Tersambung · belum ada proyek");
+      renderAll();
+    } else {
+      if(curId && !projects[curId]){ curId = Object.keys(projects)[0]||null; }
+      cur = curId ? projects[curId] : null;
+      renderSelect();
+      if(curChangedRemotely && !document.activeElement?.closest?.("#app")) renderApp();
+      else if(!cur) renderApp();
+    }
+  }, err => { clearTimeout(timer); setSync("Koneksi data terputus. Muat ulang halaman.", true); });
+}
+function startLocal(){
+  mode = "local";
+  try{ projects = JSON.parse(localStorage.getItem("utero.projects")||"{}"); }catch(e){ projects = {}; }
+  Object.keys(projects).forEach(k=>projects[k]=normalize(projects[k]));
+  if(!Object.keys(projects).length){ const ex = sampleProject(); ex.nama += " (contoh)"; projects[uid()] = ex; }
+  let saved=""; try{ saved=localStorage.getItem("utero.cur")||""; }catch(e){}
+  curId = projects[saved] ? saved : Object.keys(projects)[0]; cur = projects[curId];
+  setSync("Mode lokal · hanya tersimpan di browser ini");
+  renderAll();
+}
+function sampleProject(){
+  const p = blankProject();
+  Object.assign(p,{nama:"Booth Ice Cream Gacoan SBY",klien:"Mie Gacoan",lokasi:"Surabaya",jenis:"Booth",nilaiKontrak:26000000});
+  const it = [["Material rangka & panel","Hollow 55 1,6 : 3",9,"btg",285000],["Material rangka & panel","Hollow 46 1,6 : 3",1,"lot",600000],["Material rangka & panel","Hollow 44 1,6 : 3",1,"lot",420000],["Material rangka & panel","Plat galvanis 1 mm",4,"lbr",225000],["Material rangka & panel","Triplek 9 mm",8,"lbr",175000],["Finishing","Cat Nippon putih",3,"klg",100000],["Finishing","Cat Nippon pink",3,"klg",100000],["Finishing","Epoxy primer",3,"klg",110000],["Finishing","Tinner super",15,"L",18000],["Finishing","Dempul",2,"klg",50000],["Bahan pendukung","Kawat las + gerinda",1,"lot",250000],["Bahan pendukung","Mata bor + amplas",1,"lot",100000],["Operasional","Biaya operasional",1,"lot",500000],["Kelistrikan","Kabel dan kelistrikan",1,"lot",1000000],["Cetak & branding","Stiker retro laminasi 180×70 (4 pcs)",1,"lot",610000],["Cetak & branding","Stiker retro laminasi 220×70 (4 pcs)",1,"lot",740000],["Cetak & branding","Huruf timbul 18 pcs × 11 cm",1,"lot",2500000],["Cetak & branding","Stiker ice cream 100×70 (2 pcs)",1,"lot",192000],["Tenaga kerja","Fee produksi",1,"lot",2750000],["Pengiriman","Pengiriman & akomodasi",1,"lot",2000000]];
+  p.items = it.map(r=>({id:uid(),kat:r[0],uraian:r[1],vol:r[2],sat:r[3],harga:r[4],realisasi:0}));
+  p.team = {pic:"Siti",asisten:"Windi",desainer:"Aga",pl:"Feri",tukang:"Wanto, Ludin",keuangan:"Adza",pendamping:""};
+  return p;
+}
+
+/* ---------- render ---------- */
+function renderAll(){ renderSelect(); renderApp(); }
+function renderSelect(){
+  const sel = $("#projSel");
+  const ids = Object.keys(projects).sort((a,b)=>(projects[b].updatedAt||0)-(projects[a].updatedAt||0));
+  sel.innerHTML = ids.length ? ids.map(id=>`<option value="${esc(id)}"${id===curId?" selected":""}>${esc(projects[id].nama||"Tanpa nama")}${projects[id].klien?" · "+esc(projects[id].klien):""}</option>`).join("") : `<option>Belum ada proyek</option>`;
+  sel.disabled = !ids.length;
+  $("#btnDup").disabled = !cur; $("#btnDel").disabled = !cur;
+}
+function renderApp(){
+  const app = $("#app");
+  if(!cur){
+    app.innerHTML = `<div class="empty"><h2>Belum ada proyek</h2><p>Setiap pekerjaan baru dimulai dari sini: isi HPP, hitung harga jual, tentukan tim, jadwal 16 tahap, dan centang dokumen per gate.</p><p><button class="btn primary" data-act="new">+ Buat proyek pertama</button></p></div>`;
+    return;
+  }
+  const c = calc(cur);
+  const faseNow = FASE.find(f=>f.n===c.faseNow);
+  app.innerHTML = `
+  <section class="proj">
+    <div style="min-width:0">
+      <div class="eyebrow">Proyek</div>
+      <input class="proj-name" id="f-nama" data-f="nama" value="${esc(cur.nama)}" aria-label="Nama proyek">
+      <div class="meta">
+        <label for="f-klien">Klien <input id="f-klien" data-f="klien" value="${esc(cur.klien)}" placeholder="Nama klien"></label>
+        <label for="f-lokasi">Lokasi <input id="f-lokasi" data-f="lokasi" value="${esc(cur.lokasi)}" placeholder="Kota / venue"></label>
+        <label for="f-jenis">Jenis <input id="f-jenis" data-f="jenis" value="${esc(cur.jenis)}" placeholder="Booth, signage, event…"></label>
+      </div>
+    </div>
+    <div class="phase-now"><div class="eyebrow">Posisi sekarang</div><strong>${faseNow?`Fase ${faseNow.n} · ${esc(faseNow.nama)}`:"Proyek ditutup"}</strong><span class="hint">${faseNow?`Lanjut setelah ${faseNow.gate}: ${esc(faseNow.gt)}`:"Semua gate lolos"}</span></div>
+  </section>
+  <div class="rail" aria-label="Fase proyek">${FASE.map(f=>{
+    const st = f.n<c.faseNow?"done":(f.n===c.faseNow?"now":"");
+    return `<div class="ph ${st}"><div class="t">Fase ${f.n}</div><div class="n">${esc(f.nama)}</div><div class="g"><span class="dot"></span>${f.gate} ${st==="done"?"lolos":(st==="now"?"berjalan":"")}</div></div>`;}).join("")}</div>
+  <section class="kpis" id="kpis"></section>
+  <nav class="tabs" role="tablist">${[["ringkasan","Ringkasan"],["hpp","HPP & harga jual"],["tim","Tim kerja"],["timeline","Timeline"],["admin","Administrasi"],["panduan","Panduan SOP"]].map(([k,l])=>`<button class="tab" role="tab" data-tab="${k}" aria-selected="${tab===k}">${l}</button>`).join("")}</nav>
+  <section class="panel" id="panel"></section>
+  ${readOnly?`<div class="notice">Anda hanya bisa melihat. Minta akses Contributor atau Editor untuk mengubah data.</div>`:""}`;
+  renderKpis(); renderPanel();
+}
+function renderKpis(){
+  const c = calc(cur), el = $("#kpis"); if(!el) return;
+  el.innerHTML = `
+   <div class="kpi"><div class="eyebrow">Nilai kontrak</div><div class="v">${rp(c.kontrak)}</div><div class="s">${c.kontrak? "sebelum pajak":"belum diisi"}</div></div>
+   <div class="kpi"><div class="eyebrow">Total HPP</div><div class="v">${rp(c.hpp)}</div><div class="s">${cur.items.length} item RAB</div></div>
+   <div class="kpi ${c.mState}"><div class="eyebrow">Margin kotor</div><div class="v">${rp(c.margin)}</div><div class="s">${pct(c.marginPct)} · target ${pct(num(cur.targetMargin))}</div></div>
+   <div class="kpi ${c.late?"crit":(c.done===16?"good":"")}"><div class="eyebrow">Progres tahap</div><div class="v">${c.done}/16</div><div class="s">${c.late?c.late+" tahap terlambat":"tidak ada keterlambatan"}</div></div>
+   <div class="kpi ${c.docsDone===DOCS.length?"good":""}"><div class="eyebrow">Dokumen</div><div class="v">${c.docsDone}/${DOCS.length}</div><div class="s">kelengkapan administrasi</div></div>`;
+}
+function renderPanel(){
+  const el = $("#panel"); if(!el) return;
+  ({ringkasan:pRingkasan,hpp:pHpp,tim:pTim,timeline:pTimeline,admin:pAdmin,panduan:pPanduan}[tab]||pRingkasan)(el);
+}
+
+function pRingkasan(el){
+  const c = calc(cur), t = todayISO();
+  const next = cur.stages.map((s,i)=>({...s,i})).find(s=>s.status!=="Selesai");
+  const lateList = cur.stages.map((s,i)=>({...s,i})).filter(s=>s.selesai && s.selesai<t && s.status!=="Selesai");
+  const missingTeam = ROLES.filter(r=>!String(cur.team[r[0]]||"").trim());
+  const faseDocs = DOCS.filter(d=>d[2]===c.faseNow && !cur.docs[d[0]]);
+  const todo = [];
+  if(!c.kontrak) todo.push(["warn","Isi nilai kontrak di tab HPP & harga jual"]);
+  else if(c.mState!=="good") todo.push([c.mState,`Margin ${pct(c.marginPct)} di bawah target ${pct(num(cur.targetMargin))}. Perlu persetujuan direksi (Gate G1).`]);
+  if(missingTeam.length) todo.push(["warn",`Peran belum terisi: ${missingTeam.map(r=>r[1]).join(", ")}`]);
+  if(cur.team.pic && cur.team.pic.trim() && cur.team.pic.trim().toLowerCase()===String(cur.team.keuangan||"").trim().toLowerCase()) todo.push(["crit","PIC Proyek dan Admin Keuangan dipegang orang yang sama"]);
+  lateList.forEach(s=>todo.push(["crit",`Terlambat: ${s.i+1}. ${STAGES[s.i][1]} (target ${fmtDate(s.selesai)})`]));
+  faseDocs.forEach(d=>todo.push(["acc",`Dokumen untuk lolos gate: ${d[1]}`]));
+  el.innerHTML = `<div class="grid2">
+    <div class="card"><h3>Yang perlu dikerjakan</h3>
+      ${todo.length?todo.map(([s,m])=>`<div class="chk"><span class="pill ${s}">${s==="crit"?"Penting":s==="warn"?"Periksa":"Gate"}</span><span style="text-decoration:none;color:var(--ink)">${esc(m)}</span></div>`).join(""):`<p class="hint">Semua beres untuk fase ini.</p>`}
+      <h3 style="margin-top:18px">Tahap berikutnya</h3>
+      ${next?`<p style="margin:0"><strong>${next.i+1}. ${esc(STAGES[next.i][1])}</strong> — PIC: ${esc(next.pic||cur.team[STAGES[next.i][2]]||"belum ditentukan")} ${next.selesai?`· target ${fmtDate(next.selesai)}`:""}</p>`:`<p class="hint">Semua 16 tahap selesai.</p>`}
+    </div>
+    <div class="card"><h3>Ringkasan harga</h3>
+      <div class="price-rows">
+        <div class="pr"><span class="l">HPP</span><span class="v">${rp(c.hpp)}</span></div>
+        ${c.overhead?`<div class="pr"><span class="l">Overhead</span><span class="v">${rp(c.overhead)}</span></div>`:""}
+        ${c.kont?`<div class="pr"><span class="l">Kontinjensi</span><span class="v">${rp(c.kont)}</span></div>`:""}
+        <div class="pr"><span class="l">Retensi ${pct(num(cur.retensiPct))}</span><span class="v">${rp(c.retensi)}</span></div>
+        <div class="pr"><span class="l">Harga jual minimum</span><span class="v">${isFinite(c.hargaMin)?rp(c.hargaMin):"—"}</span></div>
+        <div class="pr total"><span class="l">Nilai kontrak</span><span class="v">${rp(c.kontrak)}</span></div>
+        <div class="pr total big"><span class="l">Margin kotor</span><span class="v ${c.margin<0?"over":""}">${rp(c.margin)}</span></div>
+      </div>
+      <button class="btn small" style="margin-top:12px" data-act="copy">Salin ringkasan untuk WA</button>
+    </div>
+  </div>`;
+}
+function fmtDate(s){ if(!s) return ""; const [y,m,d]=s.split("-").map(Number); return d+" "+["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"][m-1]+" "+y; }
+
+function pHpp(el){
+  const opts = k => KAT.map(x=>`<option${x===k?" selected":""}>${esc(x)}</option>`).join("");
+  el.innerHTML = `<div class="grid2">
+   <div style="min-width:0">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Kategori</th><th style="min-width:200px">Uraian & spesifikasi</th><th class="r">Vol</th><th>Sat</th><th class="r">Harga satuan</th><th class="r">Jumlah RAB</th><th class="r">Realisasi</th><th class="r">Selisih</th><th></th></tr></thead>
+      <tbody>${cur.items.map((it,i)=>`<tr data-i="${i}">
+        <td><select class="cell" id="k-${it.id}" data-it="kat" style="min-width:150px">${opts(it.kat)}</select></td>
+        <td><input class="cell" id="u-${it.id}" data-it="uraian" value="${esc(it.uraian)}" placeholder="Nama bahan, ukuran, merek"></td>
+        <td><input class="cell r" id="v-${it.id}" data-it="vol" inputmode="decimal" value="${esc(it.vol)}" style="width:62px"></td>
+        <td><input class="cell" id="s-${it.id}" data-it="sat" value="${esc(it.sat)}" style="width:56px"></td>
+        <td><input class="cell r" id="h-${it.id}" data-it="harga" inputmode="numeric" value="${esc(it.harga)}" style="width:110px"></td>
+        <td class="r num" data-out="jml">${rp(num(it.vol)*num(it.harga))}</td>
+        <td><input class="cell r" id="r-${it.id}" data-it="realisasi" inputmode="numeric" value="${esc(it.realisasi||"")}" placeholder="0" style="width:110px"></td>
+        <td class="r num" data-out="sel"></td>
+        <td><button class="btn ghost small" data-act="delrow" aria-label="Hapus baris">✕</button></td>
+      </tr>`).join("")}</tbody>
+      <tfoot><tr><td colspan="5">Total HPP</td><td class="r num" id="t-hpp"></td><td class="r num" id="t-real"></td><td class="r num" id="t-sel"></td><td></td></tr></tfoot>
+    </table></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn" data-act="addrow">+ Tambah item</button><span class="hint">Selisih merah = realisasi melebihi RAB lebih dari 10%. Laporkan ke PIC hari itu juga.</span></div>
+    <div class="card" style="margin-top:16px"><h3>HPP per kategori</h3><div id="katSum"></div></div>
+   </div>
+   <div class="card" id="pricing"></div>
+  </div>`;
+  updateHpp();
+}
+function updateHpp(){
+  const c = calc(cur);
+  document.querySelectorAll("#panel tbody tr[data-i]").forEach(tr=>{
+    const it = cur.items[+tr.dataset.i]; if(!it) return;
+    const j = num(it.vol)*num(it.harga), r = num(it.realisasi);
+    tr.querySelector('[data-out="jml"]').textContent = rp(j);
+    const s = tr.querySelector('[data-out="sel"]');
+    if(r){ const d=r-j; s.textContent=(d>0?"+":"")+rp(d).replace("Rp -","−Rp "); s.className="r num "+(j&&d>j*0.1?"over":(d<0?"under":"")); } else { s.textContent="—"; s.className="r num"; }
+  });
+  const th=$("#t-hpp"); if(th){ th.textContent=rp(c.hpp); $("#t-real").textContent=c.real?rp(c.real):"—"; const d=c.real-c.hpp; $("#t-sel").textContent=c.real?((d>0?"+":"")+rp(d)):"—"; $("#t-sel").className="r num "+(c.real&&d>c.hpp*0.1?"over":""); }
+  const ks = $("#katSum");
+  if(ks){
+    const sums = KAT.map(k=>[k,cur.items.filter(i=>i.kat===k).reduce((s,i)=>s+num(i.vol)*num(i.harga),0)]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+    const max = sums[0]?.[1]||1;
+    ks.innerHTML = sums.length ? sums.map(([k,v])=>`<div style="display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr) 120px;gap:10px;align-items:center;padding:4px 0;font-size:13px"><span>${esc(k)}</span><span style="height:10px;background:var(--sunk);border-radius:5px;overflow:hidden"><span style="display:block;height:100%;width:${(v/max*100).toFixed(1)}%;background:var(--accent);border-radius:5px"></span></span><span class="num" style="text-align:right">${rp(v)} <span style="color:var(--ink-3)">${pct(c.hpp?v/c.hpp*100:0)}</span></span></div>`).join("") : `<p class="hint">Isi harga satuan untuk melihat komposisi HPP.</p>`;
+  }
+  const pr = $("#pricing"); if(!pr) return;
+  const vText = {good:`Margin ${pct(c.marginPct)} memenuhi target. Gate G1 aman.`, warn:`Margin ${pct(c.marginPct)} di bawah target ${pct(num(cur.targetMargin))}. Butuh persetujuan direksi sebelum deal.`, crit: c.kontrak?`Proyek rugi ${rp(-c.margin)} pada harga ini. Jangan disetujui.`:`Isi nilai kontrak untuk melihat margin.`}[c.mState];
+  if(!pr.dataset.built){
+    pr.dataset.built="1";
+    pr.innerHTML = `<h3>Kalkulator harga jual</h3>
+     <div class="price-rows">
+      <div class="pr"><span class="l">Total HPP</span><span class="v" id="o-hpp"></span></div>
+      <div class="pr"><span class="l">Overhead kantor</span><span class="inl"><input id="p-ovh" data-f="overheadPct" inputmode="decimal" value="${esc(cur.overheadPct)}">%</span></div>
+      <div class="pr"><span class="l">Kontinjensi</span><span class="inl"><input id="p-kont" data-f="kontinjensiPct" inputmode="decimal" value="${esc(cur.kontinjensiPct)}">%</span></div>
+      <div class="pr"><span class="l">Retensi (cadangan & garansi)</span><span class="inl"><input id="p-ret" data-f="retensiPct" inputmode="decimal" value="${esc(cur.retensiPct)}">%</span></div>
+      <div class="pr"><span class="l">Target margin</span><span class="inl"><input id="p-tgt" data-f="targetMargin" inputmode="decimal" value="${esc(cur.targetMargin)}">%</span></div>
+      <div class="pr total big"><span class="l">Harga jual minimum</span><span class="v" id="o-min"></span></div>
+      <div class="pr"><span class="l">Nilai kontrak (deal)</span><span class="inl">Rp <input class="wide" id="p-kontrak" data-f="nilaiKontrak" inputmode="numeric" value="${esc(cur.nilaiKontrak||"")}" placeholder="0"></span></div>
+      <div class="pr"><span class="l">Retensi</span><span class="v" id="o-ret"></span></div>
+      <div class="pr total big"><span class="l">Margin kotor</span><span class="v" id="o-mar"></span></div>
+      <div class="pr"><label class="toggle" for="p-ppn"><input type="checkbox" id="p-ppn" data-f="ppnOn"${cur.ppnOn?" checked":""}> PPN 11% (klien PKP)</label><span class="v" id="o-ppn"></span></div>
+      <div class="pr"><label class="toggle" for="p-pph"><input type="checkbox" id="p-pph" data-f="pphOn"${cur.pphOn?" checked":""}> Potongan PPh 23 2%</label><span class="v" id="o-pph"></span></div>
+      <div class="pr total"><span class="l">Ditagihkan ke klien</span><span class="v" id="o-tagih"></span></div>
+      <div class="pr total"><span class="l">Diterima di rekening</span><span class="v" id="o-terima"></span></div>
+     </div>
+     <div class="verdict" id="o-verdict"></div>
+     <div class="formula">Harga min = (HPP + overhead + kontinjensi) ÷ (1 − retensi% − target%)<br>Margin = kontrak − HPP − overhead − kontinjensi − retensi</div>`;
+  }
+  $("#o-hpp").textContent = rp(c.hpp);
+  $("#o-min").textContent = isFinite(c.hargaMin)?rp(c.hargaMin):"Target terlalu tinggi";
+  $("#o-ret").textContent = rp(c.retensi);
+  $("#o-mar").textContent = rp(c.margin) + " · " + pct(c.marginPct);
+  $("#o-mar").className = "v "+(c.margin<0?"over":"");
+  $("#o-ppn").textContent = cur.ppnOn?"+"+rp(c.ppn):"—";
+  $("#o-pph").textContent = cur.pphOn?"−"+rp(c.pph):"—";
+  $("#o-tagih").textContent = rp(c.kontrak+c.ppn);
+  $("#o-terima").textContent = rp(c.kontrak+c.ppn-c.pph);
+  const v=$("#o-verdict"); v.className="verdict "+c.mState; v.textContent=vText;
+}
+
+function pTim(el){
+  const same = cur.team.pic && cur.team.pic.trim() && cur.team.pic.trim().toLowerCase()===String(cur.team.keuangan||"").trim().toLowerCase();
+  el.innerHTML = `<div class="card"><h3>Susunan tim proyek</h3><p class="hint" style="margin-bottom:8px">Semua peran wajib terisi sebelum SPK terbit. Satu orang boleh memegang dua peran di proyek kecil, kecuali PIC Proyek dan Admin Keuangan.</p>
+   <div class="team">${ROLES.map(([k,l,d])=>`<div class="role"><label for="t-${k}">${l}<small>${d}</small></label><input id="t-${k}" data-team="${k}" value="${esc(cur.team[k]||"")}" placeholder="Nama"></div>`).join("")}</div>
+   <div class="alert warn" id="sameWarn"${same?"":" hidden"}>PIC Proyek dan Admin Keuangan harus orang berbeda untuk kontrol uang.</div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>Siapa memutuskan apa</h3>
+   <div class="tbl-wrap"><table><thead><tr><th>Keputusan</th><th>Mengerjakan</th><th>Menyetujui</th></tr></thead><tbody>
+    ${[["Penawaran & BOQ","Desainer, Project Leader","PIC Proyek"],["Harga di bawah target margin","PIC Proyek","Direksi"],["SPK & DP","Admin Keuangan","PIC Proyek"],["Gambar kerja final","Desainer","PIC Proyek"],["RAB final & belanja","Project Leader","Admin Keuangan"],["QC internal","Tukang","Project Leader"],["BAST","Project Leader","PIC Proyek"],["Penagihan & pelunasan","Admin Keuangan","Admin Keuangan"]].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td><strong>${r[2]}</strong></td></tr>`).join("")}
+   </tbody></table></div></div>`;
+}
+
+function pTimeline(el){
+  const dates = cur.stages.flatMap(s=>[s.mulai,s.selesai]).filter(Boolean).sort();
+  const t = todayISO();
+  const lo = dates[0], hi = dates[dates.length-1];
+  const D = s => Date.parse(s)/864e5;
+  const span = lo&&hi ? Math.max(1, D(hi)-D(lo)+1) : 0;
+  const pos = s => span ? ((D(s)-D(lo))/span*100) : 0;
+  const statOpts = v => STATUS.map(x=>`<option${x===v?" selected":""}>${x}</option>`).join("");
+  let rows = "";
+  FASE.forEach(f=>{
+    rows += `<tr class="fase-row"><td colspan="6">Fase ${f.n} · ${esc(f.nama)}<span class="gate">${f.gate}: ${esc(f.gt)}</span></td></tr>`;
+    STAGES.forEach((st,i)=>{ if(st[0]!==f.n) return; const s=cur.stages[i];
+      const late = s.selesai && s.selesai<t && s.status!=="Selesai";
+      const bar = (s.mulai&&s.selesai&&span) ? `<span class="bar ${s.status==="Selesai"?"done":late?"late":s.status==="Proses"?"":"plan"}" style="left:${pos(s.mulai)}%;width:${Math.max(2,(D(s.selesai)-D(s.mulai)+1)/span*100)}%"></span>` : "";
+      const today = span && t>=lo && t<=hi ? `<span class="today" style="left:${pos(t)}%" title="Hari ini"></span>` : "";
+      rows += `<tr data-s="${i}">
+        <td style="min-width:210px"><span class="num" style="color:var(--ink-3)">${i+1}.</span> ${esc(st[1])} ${late?`<span class="pill crit">Terlambat</span>`:""}</td>
+        <td><input class="cell" id="sp-${i}" data-st="pic" value="${esc(s.pic)}" placeholder="${esc(cur.team[st[2]]||ROLES.find(r=>r[0]===st[2])[1])}" style="width:120px"></td>
+        <td><input class="cell" type="date" id="sm-${i}" data-st="mulai" value="${esc(s.mulai)}"></td>
+        <td><input class="cell" type="date" id="ss-${i}" data-st="selesai" value="${esc(s.selesai)}"></td>
+        <td><select class="cell" id="st-${i}" data-st="status" style="width:120px">${statOpts(s.status)}</select></td>
+        <td><div class="track">${bar}${today}</div></td></tr>`;
+    });
+  });
+  el.innerHTML = `<div class="tbl-wrap"><table><thead><tr><th>Tahap</th><th>PIC</th><th>Mulai</th><th>Selesai</th><th>Status</th><th style="min-width:240px">${lo?`${fmtDate(lo)} – ${fmtDate(hi)}`:"Bagan waktu"}</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="hint" style="margin-top:10px">Susun mundur dari tanggal BAST yang diminta klien. Sisakan minimal satu hari cadangan sebelum pengiriman. Garis kuning = hari ini; batang merah = lewat target dan belum selesai.${lo?"":" Isi tanggal mulai dan selesai agar bagan muncul."}</p>`;
+}
+
+function pAdmin(el){
+  const c = calc(cur);
+  el.innerHTML = `<p class="hint" style="margin:0 0 14px">Simpan semua dokumen di satu folder bernama <span class="num">TAHUN-KLIEN-PROYEK</span>. Gate lolos otomatis saat semua dokumen di fasenya dicentang.</p>
+  <div class="docs">${FASE.map(f=>{
+    const list = DOCS.filter(d=>d[2]===f.n), ok = list.every(d=>cur.docs[d[0]]);
+    return `<div class="card doc-group"><div class="head"><h3>Fase ${f.n} · ${esc(f.nama)}</h3><span class="pill ${ok?"good":(f.n===c.faseNow?"acc":"")}">${f.gate} ${ok?"lolos":f.n===c.faseNow?"berjalan":"menunggu"}</span></div>
+      <p class="hint" style="margin:0 0 6px">${esc(f.gt)} · ${esc(f.owner)}</p>
+      ${list.map(d=>`<label class="chk${cur.docs[d[0]]?" on":""}" for="d-${d[0]}"><input type="checkbox" id="d-${d[0]}" data-doc="${d[0]}"${cur.docs[d[0]]?" checked":""}><span>${esc(d[1])}</span></label>`).join("")}
+    </div>`;}).join("")}</div>
+  <div class="card" style="margin-top:16px"><h3>Catatan proyek</h3><textarea id="f-catatan" data-f="catatan" rows="4" style="width:100%;border:1px solid var(--line);border-radius:4px;padding:8px;background:var(--bg)" placeholder="Link folder Drive, nomor SPK, termin pembayaran, kontak klien…">${esc(cur.catatan)}</textarea></div>`;
+}
+
+function pPanduan(el){
+  const out = {1:"Gambar konsep, BOQ, RAB awal, surat penawaran, persetujuan tertulis",2:"SPK bertanda tangan, invoice DP, bukti DP masuk",3:"Form survei, gambar kerja ber-ACC, RAB final terkunci, jadwal harian",4:"Nota belanja, checklist material, foto progres, checklist QC",5:"Surat jalan, foto terpasang, punch list, BAST + foto akhir",6:"Invoice pelunasan, bukti bayar, laporan margin aktual vs RAB"};
+  const tahap = {1:"1–2",2:"3",3:"4–6",4:"7–10",5:"11–15",6:"16"};
+  el.innerHTML = `<div class="grid2 guide">
+   <div class="card"><h3>Alur 6 fase</h3><div class="steps">${FASE.map(f=>`<div class="step"><div class="no">${f.n}</div><div><h3>${esc(f.nama)} <span class="pill">Tahap ${tahap[f.n]}</span></h3><p>Output wajib: ${out[f.n]}.</p><div class="gt"><span class="pill acc">${f.gate}</span> ${esc(f.gt)} — diputuskan ${esc(f.owner)}</div></div></div>`).join("")}</div></div>
+   <div style="display:grid;gap:16px;min-width:0">
+    <div class="card"><h3>Aturan emas</h3><ol>
+     <li>Tidak ada belanja sebelum SPK dan DP.</li><li>Tidak ada produksi sebelum gambar kerja di-ACC.</li><li>Tidak ada pengiriman sebelum QC lolos.</li><li>Tidak ada perubahan gratis setelah Gate G3.</li><li>Setiap rupiah yang keluar punya baris di RAB dan nota.</li><li>Proyek belum selesai sebelum laporan margin aktual dibahas.</li></ol></div>
+    <div class="card"><h3>Tanda bahaya, lapor hari itu juga</h3><ul style="margin:0;padding-left:20px"><li>Tahap mundur lebih dari satu hari</li><li>Belanja melebihi RAB lebih dari 10%</li><li>Klien minta perubahan setelah Gate G3</li></ul></div>
+    <div class="card"><h3>Dokumen SOP lengkap</h3><p class="hint" style="margin:0 0 8px">Penjelasan peran, rumus, dan format RAB standar.</p><a href="${SOP_URL}" target="_blank" rel="noopener">Buka SOP Sistem Proyek Utero ↗</a></div>
+   </div></div>`;
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e=>{
+  const tb = e.target.closest("[data-tab]");
+  if(tb){ tab = tb.dataset.tab; try{localStorage.setItem("utero.tab",tab);}catch(_){} document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===tab)); renderPanel(); return; }
+  const a = e.target.closest("[data-act]"); if(!a) return;
+  const act = a.dataset.act;
+  if(act==="new") newProject();
+  if(act==="addrow"){ cur.items.push({id:uid(),kat:cur.items.at(-1)?.kat||KAT[0],uraian:"",vol:1,sat:"lot",harga:0,realisasi:0}); scheduleSave(); renderPanel(); renderKpis(); const last=document.querySelector("#panel tbody tr:last-child [data-it='uraian']"); last&&last.focus(); }
+  if(act==="delrow"){ const i=+a.closest("tr").dataset.i; cur.items.splice(i,1); scheduleSave(); renderPanel(); renderKpis(); }
+  if(act==="copy") copySummary();
+  if(act==="delyes"){ deleteProject(); }
+  if(act==="delno"){ confirmDel=false; renderDel(); }
+});
+$("#btnNew").addEventListener("click", newProject);
+$("#btnDup").addEventListener("click", ()=>{ if(!cur) return; const p=JSON.parse(JSON.stringify(cur)); p.nama=cur.nama+" (salinan)"; p.docs={}; p.stages=STAGES.map(()=>({mulai:"",selesai:"",status:"Belum mulai",pic:""})); p.items.forEach(i=>{i.id=uid();i.realisasi=0;}); addProject(p); toast("Proyek diduplikat sebagai templat"); });
+$("#btnDel").addEventListener("click", ()=>{ if(!cur) return; confirmDel=true; renderDel(); });
+$("#projSel").addEventListener("change", e=>{ flushNow(); curId=e.target.value; cur=projects[curId]; rememberCur(); confirmDel=false; renderDel(); renderApp(); });
+function renderDel(){ $("#delZone").innerHTML = confirmDel ? `<span class="confirm">Hapus proyek ini? <button class="btn danger small" data-act="delyes">Ya, hapus</button><button class="btn small" data-act="delno">Batal</button></span>` : `<button class="btn ghost" id="btnDel">Hapus</button>`; const b=$("#btnDel"); b&&b.addEventListener("click",()=>{ if(!cur) return; confirmDel=true; renderDel(); }); }
+function flushNow(){ if(dirty){ clearTimeout(saveTimer); flush(); } }
+function newProject(){ addProject(blankProject()); toast("Proyek baru dibuat"); tab="hpp"; }
+async function addProject(p){
+  if(readOnly){ toast("Anda hanya punya akses lihat"); return; }
+  flushNow();
+  const id = uid(); p.updatedAt = Date.now(); projects[id]=p; curId=id; cur=p; rememberCur();
+  renderAll();
+  try{ if(mode==="db") await db.collection("projects").doc(id).set(JSON.parse(JSON.stringify(p))); else localStore(); setSync(mode==="db"?"Tersimpan · semua tim melihat data ini":"Tersimpan di browser ini"); }
+  catch(e){ if(e&&e.code==="invalid_argument"){ readOnly=true; delete projects[id]; curId=Object.keys(projects)[0]||null; cur=curId?projects[curId]:null; renderAll(); setSync("Hanya-baca: Anda tidak punya akses ubah",true);} else if(e&&e.code==="quota_exceeded") setSync("Penyimpanan penuh, hapus proyek lama",true); else setSync("Gagal menyimpan proyek baru",true); }
+}
+async function deleteProject(){
+  const id = curId; confirmDel=false;
+  try{ if(mode==="db") await db.collection("projects").doc(id).delete(); delete projects[id]; if(mode!=="db") localStore(); toast("Proyek dihapus"); }
+  catch(e){ setSync("Gagal menghapus",true); }
+  curId = Object.keys(projects)[0]||null; cur = curId?projects[curId]:null; rememberCur(); renderDel(); renderAll();
+}
+function copySummary(){
+  const c = calc(cur);
+  const txt = `*${cur.nama}*${cur.klien?" — "+cur.klien:""}\nHPP: ${rp(c.hpp)}\nRetensi ${pct(num(cur.retensiPct))}: ${rp(c.retensi)}\nHarga jual minimum: ${isFinite(c.hargaMin)?rp(c.hargaMin):"-"}\nNilai kontrak: ${rp(c.kontrak)}\nMargin kotor: ${rp(c.margin)} (${pct(c.marginPct)})\nProgres: ${c.done}/16 tahap · Dokumen ${c.docsDone}/${DOCS.length}`;
+  const done = ()=>toast("Ringkasan disalin");
+  const fallback = ()=>{ const ta=document.createElement("textarea"); ta.value=txt; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); done();}catch(_){toast("Tekan Ctrl+C untuk menyalin");} setTimeout(()=>ta.remove(),100); };
+  try{ navigator.clipboard.writeText(txt).then(done, fallback); }catch(_){ fallback(); }
+}
+
+document.addEventListener("input", e=>{
+  if(!cur || !e.target.closest("#app")) return;
+  const t = e.target;
+  if(t.dataset.f){
+    const f=t.dataset.f; cur[f] = t.type==="checkbox" ? t.checked : (["nama","klien","lokasi","jenis","catatan"].includes(f) ? t.value : num(t.value));
+    scheduleSave(); renderKpis(); if(tab==="hpp") updateHpp();
+    if(["nama","klien"].includes(f)) renderSelect();
+  } else if(t.dataset.it){
+    const i=+t.closest("tr").dataset.i; const k=t.dataset.it;
+    cur.items[i][k] = ["kat","uraian","sat"].includes(k) ? t.value : num(t.value);
+    scheduleSave(); renderKpis(); updateHpp();
+  } else if(t.dataset.team){
+    cur.team[t.dataset.team]=t.value; scheduleSave();
+    const w=$("#sameWarn"); if(w){ w.hidden = !(cur.team.pic && cur.team.pic.trim() && cur.team.pic.trim().toLowerCase()===String(cur.team.keuangan||"").trim().toLowerCase()); }
+  } else if(t.dataset.st){
+    const i=+t.closest("tr").dataset.s; cur.stages[i][t.dataset.st]=t.value; scheduleSave(); renderKpis();
+  } else if(t.dataset.doc){
+    cur.docs[t.dataset.doc]=t.checked; scheduleSave(); renderApp();
+  }
+});
+document.addEventListener("change", e=>{
+  const t=e.target; if(!cur || !t.closest("#panel")) return;
+  if(t.dataset.st && t.dataset.st!=="pic"){ const y=window.scrollY; pTimeline($("#panel")); window.scrollTo(0,y); }
+});
+window.addEventListener("pagehide", flushNow);
+
+renderDel();
+start();
+})();
+</script>
+
+</body></html>
