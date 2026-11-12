@@ -835,6 +835,24 @@ Setiap migration memiliki migration turun yang realistis. Untuk migration data d
 | Job error rows | 90 hari | Redaksi data sensitif |
 | Evidence | Sesuai umur proyek + kebijakan arsip | Soft delete lalu purge terjadwal |
 
+## 14. Ruang Proyek
+
+Migration `0010_colorful_toxin.sql` menambah model project-scoped berikut:
+
+- `project_workspaces`: profil komersial, pajak, retensi, status komersial, fase aktif, dan version.
+- `project_cost_items`: RAB rencana dan realisasi dengan `numeric`, urutan stabil, version, serta soft delete.
+- `project_phase_instances`: enam fase/gate per proyek dengan owner role, status, actor, dan timestamp keputusan.
+- `project_stage_instances`: enam belas tahap dengan tanggal rencana/aktual, assignee, status, progress, dan version.
+- `project_document_requirements`: tiga belas requirement yang ditautkan ke evidence privat dan review actor.
+
+Nilai uang memakai `numeric(19,2)`, quantity `numeric(18,4)`, dan persentase `numeric(7,4)`. Kalkulasi aplikasi memakai fixed-point `BigInt`; nilai aktual yang belum dilaporkan tetap `NULL`.
+
+Role aktif `project_assignments` dibatasi ke `PIC`, `PIC_ASSISTANT`, `DESIGNER`, `PROJECT_LEADER`, `PRODUCTION_TEAM`, `FINANCE_ADMIN`, dan `INSTALLATION_SUPPORT`. Policy aplikasi mencegah konflik PIC/Finance dan menjaga singleton role yang relevan.
+
 Retensi wajib dikonfirmasi pemilik data. Audit harus mencatat purge terjadwal tanpa menyalin ulang payload sensitif yang dihapus.
 
 
+
+## Legacy Workspace Import Ledger
+
+`project_workspace_imports` menyimpan binding preview dan idempotensi per proyek legacy. Unique index `project_workspace_import_idempotency_uq` memakai key `project-workspace-import:{sourceHash}:{legacyId}`. Kolom target version mengikat dry-run ke snapshot proyek; `mapping_hash` mencegah perubahan mapping setelah preview. Payload JSON finansial tidak disimpan. Migration: `0012_sad_hawkeye.sql`.

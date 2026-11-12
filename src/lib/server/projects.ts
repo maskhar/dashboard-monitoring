@@ -1,11 +1,17 @@
 import { and, asc, eq, ilike, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { auditEvents, projectAssignments, projectProgress, projects, users } from "@/db/schema";
+import { auditEvents, projectAssignments, projectProgress, projects, projectWorkspaces, users } from "@/db/schema";
 import { HttpError } from "./authz";
 import { canEditProject, validateProjectState, type AppRole, type ProjectState } from "./domain";
 
 type Actor = { id: string; role: AppRole };
 export type ProjectView = "active" | "archived" | "deleted" | "all";
+
+export class ProjectAssignmentVersionConflict extends HttpError {
+  constructor(public current: unknown) {
+    super(409, "Project assignment changed; reload before saving");
+  }
+}
 
 export type CreateProjectInput = {
   code: string; brand: string; startDate?: string; dueDate?: string; program?: string; category?: string;
@@ -56,7 +62,7 @@ async function listProjectsInternal(actor: Actor, input: { q?: string; status?: 
   if (actor.role === "STAFF") filters.push(sql`exists (select 1 from ${projectAssignments} pa where pa.project_id = ${projects.id} and pa.user_id = ${actor.id} and pa.active = true)`);
   if (input.q) filters.push(or(ilike(projects.code, `%${input.q}%`), ilike(projects.brand, `%${input.q}%`))!);
   if (input.status) filters.push(eq(projects.status, input.status));
-  return db.select({ id: projects.id, code: projects.code, brand: projects.brand, program: projects.program, category: projects.category, status: projects.status, progress: projects.progress, startDate: projects.startDate, dueDate: projects.dueDate, publishedAt: projects.publishedAt, notes: projects.notes, version: projects.version, archivedAt: projects.archivedAt, deletedAt: projects.deletedAt, createdAt: projects.createdAt, updatedAt: projects.updatedAt, assignee: { id: users.id, name: users.name } }).from(projects).leftJoin(projectAssignments, and(eq(projectAssignments.projectId, projects.id), eq(projectAssignments.active, true), eq(projectAssignments.role, "PIC"))).leftJoin(users, eq(projectAssignments.userId, users.id)).where(and(...filters)).orderBy(asc(projects.code)).limit(limit).offset(Math.max(input.offset ?? 0, 0));
+  return db.select({ id: projects.id, code: projects.code, brand: projects.brand, program: projects.program, category: projects.category, status: projects.status, progress: projects.progress, startDate: projects.startDate, dueDate: projects.dueDate, publishedAt: projects.publishedAt, notes: projects.notes, version: projects.version, assignmentVersion: sql<number>`coalesce(${projectWorkspaces.version}, ${projects.version})`, archivedAt: projects.archivedAt, deletedAt: projects.deletedAt, createdAt: projects.createdAt, updatedAt: projects.updatedAt, assignee: { id: users.id, name: users.name } }).from(projects).leftJoin(projectWorkspaces, eq(projectWorkspaces.projectId, projects.id)).leftJoin(projectAssignments, and(eq(projectAssignments.projectId, projects.id), eq(projectAssignments.active, true), eq(projectAssignments.role, "PIC"))).leftJoin(users, eq(projectAssignments.userId, users.id)).where(and(...filters)).orderBy(asc(projects.code)).limit(limit).offset(Math.max(input.offset ?? 0, 0));
 }
 
 export async function changeProjectLifecycle(actor: Actor, id: string, action: "archive" | "restore" | "delete") {
@@ -89,21 +95,41 @@ export async function updateProject(actor: Actor, id: string, input: { status: P
   });
 }
 
-export async function assignProject(actorId: string, projectId: string, userId: string | null) {
+export async function assignProject(actor: Actor, projectId: string, input: { userId: string | null; version: number }) {
+  if (actor.role !== "ADMIN") throw new HttpError(403, "Forbidden");
   return db.transaction(async (tx) => {
-    const [project] = await tx.select().from(projects).where(eq(projects.id, projectId)).limit(1);
+    const [project] = await tx.select().from(projects).where(eq(projects.id, projectId)).for("update").limit(1);
     if (!project) throw new HttpError(404, "Project not found");
     if (project.archivedAt || project.deletedAt) throw new HttpError(409, "Archived or deleted projects cannot be assigned");
-    if (userId) {
-      const [staff] = await tx.select().from(users).where(and(eq(users.id, userId), eq(users.role, "STAFF"), eq(users.status, "ACTIVE"))).limit(1);
+
+    const [workspace] = await tx.select().from(projectWorkspaces).where(eq(projectWorkspaces.projectId, projectId)).for("update").limit(1);
+    const versionedState = workspace ?? project;
+    if (versionedState.version !== input.version) throw new ProjectAssignmentVersionConflict(versionedState);
+
+    if (input.userId) {
+      const [staff] = await tx.select({ id: users.id }).from(users).where(and(eq(users.id, input.userId), eq(users.role, "STAFF"), eq(users.status, "ACTIVE"), isNull(users.deletedAt))).for("share").limit(1);
       if (!staff) throw new HttpError(400, "PIC must be an active STAFF user");
+      const [financeConflict] = await tx.select({ id: projectAssignments.id }).from(projectAssignments).where(and(eq(projectAssignments.projectId, projectId), eq(projectAssignments.userId, input.userId), eq(projectAssignments.role, "FINANCE_ADMIN"), eq(projectAssignments.active, true))).limit(1);
+      if (financeConflict) throw new HttpError(409, "The same user cannot hold PIC and FINANCE_ADMIN roles on one project");
     }
-    const [previous] = await tx.select({ id: projectAssignments.id, userId: projectAssignments.userId }).from(projectAssignments).where(and(eq(projectAssignments.projectId, projectId), eq(projectAssignments.active, true), eq(projectAssignments.role, "PIC"))).limit(1);
-    if (previous) await tx.update(projectAssignments).set({ active: false, endedAt: new Date() }).where(eq(projectAssignments.id, previous.id));
+
+    const [previous] = await tx.select().from(projectAssignments).where(and(eq(projectAssignments.projectId, projectId), eq(projectAssignments.active, true), eq(projectAssignments.role, "PIC"))).for("update").limit(1);
+    if ((previous?.userId ?? null) === input.userId) {
+      return { projectId, userId: input.userId, assignment: previous ?? null, version: versionedState.version };
+    }
+
+    const now = new Date();
+    if (previous) await tx.update(projectAssignments).set({ active: false, endedAt: now }).where(eq(projectAssignments.id, previous.id));
     let assignment = null;
-    if (userId) [assignment] = await tx.insert(projectAssignments).values({ projectId, userId, role: "PIC" }).returning();
-    await tx.insert(auditEvents).values({ actorId, action: "project.assignment.updated", entityType: "PROJECT", entityId: projectId, changes: { from: previous?.userId ?? null, to: userId } });
-    return { projectId, userId, assignment };
+    if (input.userId) [assignment] = await tx.insert(projectAssignments).values({ projectId, userId: input.userId, role: "PIC" }).returning();
+
+    const [updatedVersion] = workspace
+      ? await tx.update(projectWorkspaces).set({ version: sql`${projectWorkspaces.version} + 1`, updatedAt: now }).where(and(eq(projectWorkspaces.projectId, projectId), eq(projectWorkspaces.version, input.version))).returning()
+      : await tx.update(projects).set({ version: sql`${projects.version} + 1`, updatedAt: now }).where(and(eq(projects.id, projectId), eq(projects.version, input.version))).returning();
+    if (!updatedVersion) throw new ProjectAssignmentVersionConflict(versionedState);
+
+    await tx.insert(auditEvents).values({ actorId: actor.id, action: "project.assignment.updated", entityType: "PROJECT", entityId: projectId, changes: { from: previous?.userId ?? null, to: input.userId }, metadata: { versionSource: workspace ? "workspace" : "project", previousVersion: input.version, version: updatedVersion.version } });
+    return { projectId, userId: input.userId, assignment, version: updatedVersion.version };
   });
 }
 

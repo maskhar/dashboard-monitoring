@@ -24,7 +24,7 @@ export async function listEvidence(actor: Actor, entityType: string, entityId: s
   return db.select({ id: evidence.id, entityType: evidence.entityType, entityId: evidence.entityId, originalName: evidence.originalName, mimeType: evidence.mimeType, size: evidence.size, checksum: evidence.checksum, scanStatus: evidence.scanStatus, createdAt: evidence.createdAt, uploadedBy: { id: users.id, name: users.name } }).from(evidence).innerJoin(users, eq(evidence.uploadedBy, users.id)).where(and(eq(evidence.entityType, entityType), eq(evidence.entityId, entityId), isNull(evidence.deletedAt))).orderBy(desc(evidence.createdAt));
 }
 
-export async function saveEvidence(actor: Actor, file: File, entityType: string, entityId: string) {
+export async function prepareEvidenceUpload(actor: Actor, file: File, entityType: string, entityId: string) {
   const maxBytes = Number(process.env.EVIDENCE_MAX_BYTES ?? 10 * 1024 * 1024);
   if (!allowedTypes.has(file.type)) throw new HttpError(415, "Unsupported evidence type");
   if (file.size < 1 || file.size > maxBytes) throw new HttpError(413, "Evidence exceeds size limit");
@@ -39,13 +39,21 @@ export async function saveEvidence(actor: Actor, file: File, entityType: string,
   const destination = path.join(storageRoot(), ...storageKey.split("/"));
   await mkdir(path.dirname(destination), { recursive: true });
   await writeFile(destination, bytes, { flag: "wx" });
+  return {
+    values: { entityType, entityId, storageKey, originalName: path.basename(file.name), mimeType: file.type, size: file.size, checksum, uploadedBy: actor.id, scanStatus },
+    cleanup: () => unlink(destination).catch(() => undefined),
+  };
+}
+
+export async function saveEvidence(actor: Actor, file: File, entityType: string, entityId: string) {
+  const prepared = await prepareEvidenceUpload(actor, file, entityType, entityId);
   try {
     return await db.transaction(async (tx) => {
-      const [row] = await tx.insert(evidence).values({ entityType, entityId, storageKey, originalName: path.basename(file.name), mimeType: file.type, size: file.size, checksum, uploadedBy: actor.id, scanStatus }).returning();
-      await tx.insert(auditEvents).values({ actorId: actor.id, action: "evidence.uploaded", entityType, entityId, metadata: { evidenceId: row.id, size: file.size, checksum } });
+      const [row] = await tx.insert(evidence).values(prepared.values).returning();
+      await tx.insert(auditEvents).values({ actorId: actor.id, action: "evidence.uploaded", entityType, entityId, metadata: { evidenceId: row.id, size: file.size, checksum: prepared.values.checksum } });
       return row;
     });
-  } catch (error) { await unlink(destination).catch(() => undefined); throw error; }
+  } catch (error) { await prepared.cleanup(); throw error; }
 }
 
 export async function downloadEvidence(actor: Actor, id: string) {

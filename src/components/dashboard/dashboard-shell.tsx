@@ -1,10 +1,10 @@
 "use client";
 
-import { Activity, Bell, ChevronRight, ClipboardCheck, FolderKanban, History, LayoutDashboard, ListChecks, Menu, Users, X } from "lucide-react";
+import { Activity, Bell, ChevronRight, ClipboardCheck, FileJson, FolderKanban, History, LayoutDashboard, ListChecks, Menu, Users, X } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { ApprovalsSection, AuditSection, UserManagementSection } from "./sections/admin";
+import { ApprovalsSection, AuditSection, LegacyImportPanel, UserManagementSection } from "./sections/admin";
 import { initials, readJson, type Approval, type AuditEvent, type OperationsData, type OverviewData, type Project, type Section, type User, type Viewer } from "./sections/common";
 import { OperationsSection } from "./sections/operations";
 import { OverviewSection } from "./sections/overview";
@@ -92,7 +92,7 @@ export function DashboardShell({ viewer }: { viewer: Viewer }) {
   const navItems = useMemo(() => [
     { id: "overview" as const, label: "Ringkasan", icon: LayoutDashboard }, { id: "projects" as const, label: "Proyek Desain", icon: FolderKanban }, { id: "tasks" as const, label: "Tugas", icon: ListChecks }, { id: "operations" as const, label: "Operasional", icon: Activity },
     { id: "approvals" as const, label: isAdmin ? "Persetujuan" : "Pengajuan Saya", icon: ClipboardCheck, count: approvals.length },
-    ...(isAdmin ? [{ id: "users" as const, label: "Pengguna", icon: Users }, { id: "audit" as const, label: "Riwayat", icon: History }] : []),
+    ...(isAdmin ? [{ id: "imports" as const, label: "Migrasi Legacy", icon: FileJson }, { id: "users" as const, label: "Pengguna", icon: Users }, { id: "audit" as const, label: "Riwayat", icon: History }] : []),
   ], [approvals.length, isAdmin]);
   function navigate(next: Section) { setSection(next); setMobileOpen(false); setMessage(""); setError(""); }
   const title = navItems.find((item) => item.id === section)?.label ?? "Dashboard";
@@ -111,6 +111,7 @@ export function DashboardShell({ viewer }: { viewer: Viewer }) {
         {!loading && section === "tasks" ? <TasksSection viewer={viewer} projects={projects} users={users} setMessage={setMessage} setError={setError} /> : null}
         {!loading && section === "operations" ? <OperationsSection viewer={viewer} data={operations} users={users} reload={loadAll} setMessage={setMessage} setError={setError} /> : null}
         {!loading && section === "approvals" ? <ApprovalsSection viewer={viewer} items={approvals} reload={loadAll} setMessage={setMessage} setError={setError} /> : null}
+        {!loading && section === "imports" && isAdmin ? <LegacyImportPanel users={users} reload={loadAll} setMessage={setMessage} /> : null}
         {!loading && section === "users" && isAdmin ? <UserManagementSection viewer={viewer} users={users} reload={loadAll} setMessage={setMessage} setError={setError} /> : null}
         {!loading && section === "audit" && isAdmin ? <AuditSection items={audit} /> : null}
       </div>

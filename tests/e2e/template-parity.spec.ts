@@ -17,7 +17,8 @@ test("template desain mempertahankan workload, filter dan peringatan sumber", as
   await openSection(page, "Proyek Desain", isMobile);
   await expect(page.getByRole("heading", { name: "Beban kerja per desainer" })).toBeVisible();
   await expect(page.getByText("Batas wajar: 5 proyek aktif per orang.")).toBeVisible();
-  await expect(page.locator(".projects-table tbody tr")).toHaveCount(65);
+  const projects = await page.request.get("/api/projects?limit=100").then((response) => response.json()) as { data: unknown[] };
+  await expect(page.locator(".projects-table tbody tr")).toHaveCount(projects.data.length);
   await expect(page.getByLabel("Filter program")).toBeVisible();
   await expect(page.getByLabel("Filter PIC")).toBeVisible();
   await page.getByLabel("Filter peringatan").selectOption("Cek data");

@@ -1,49 +1,46 @@
 # Status Implementasi
 
-**Tanggal verifikasi:** 6 November 2026
+**Tanggal verifikasi:** 8 November 2026
 
-## Selesai
+## Ruang Proyek
 
-- Dashboard tunggal Next.js untuk Admin dan Staff.
-- PostgreSQL menjadi sumber data; UI tidak memakai fallback demo.
-- Data contoh tersanitasi dari dua template: 65 proyek, 3 periode, 9 definisi KPI, 27 target KPI, 33 minggu, 20 milestone, dan 5 gate.
-- Scope Staff berdasarkan assignment; Admin melihat seluruh data.
-- User management, PIC proyek, evidence upload/download, approval, audit, import/export Excel, dan PDF.
-- Perubahan timeline oleh Staff masuk approval; Admin approval memakai version check dan baru kemudian menerapkan snapshot.
-- Docker lokal pada app port 3030 dan PostgreSQL host port 5433.
-- Responsive desktop/mobile dan dark mode.
-- Monitoring P3 untuk app, query PostgreSQL, ClamAV, dan usia backup; alert/recovery webhook opsional tanpa Docker socket.
-- Dokumentasi handoff credential OAuth production dan uji restore terisolasi.
+- Ruang Proyek terintegrasi pada `/projects/{id}/workspace` dan dapat dibuka dari daftar/detail proyek.
+- PostgreSQL menyimpan workspace, RAB/HPP, enam fase, enam belas tahap, tujuh role tim, dan tiga belas requirement dokumen.
+- Tim dapat dikelola Admin; timeline dapat diperbarui sesuai assignment; dokumen memakai evidence privat dan ClamAV.
+- Gate mendukung ready, submit, approval/rejection, passed, dan reopen dengan version check, audit, approval action, serta notification job.
+- Data finansial hanya dikirim server kepada Admin, PIC, Project Leader, dan Finance Admin.
+- Commercial lock, archived read-only guard, evidence replacement guard, fixed-point money, dan optimistic concurrency diterapkan.
+- Generic approval tidak dapat memutus approval fase; keputusan fase wajib melalui endpoint fase khusus.
+- Legacy PIC assignment memakai lock transaksi, conflict check PIC-Finance, dan assignment version.
 
-## Konfigurasi Production Tersisa
+## Migrasi Legacy
 
-- Lakukan handoff `AUTH_GOOGLE_ID` dan `AUTH_GOOGLE_SECRET` sesuai `docs/DEPLOYMENT.md`, lalu verifikasi login production.
-- Isi `EMAIL_WEBHOOK_URL` dan `WHATSAPP_WEBHOOK_URL` sesuai provider.
-- Service `monitor` sudah berjalan; isi `MONITOR_WEBHOOK_URL` sesuai provider/relay insiden.
-- Restore terisolasi DB, aplikasi, dan evidence lulus; login OAuth production tetap menunggu credential sebelum go-live.
+- Menu Admin `Migrasi Legacy` menerima JSON hasil `utero.projects` atau export Claude Artifact.
+- Alur terdiri dari upload, preview, mapping proyek/user, dry-run rekonsiliasi, konfirmasi warning, dan commit.
+- Proyek baru wajib memakai kode `DP-*`; workspace existing tidak dapat ditimpa kecuali replay idempotent persis.
+- Nama user ambigu tidak dipetakan otomatis. Mapping dapat diarahkan ke user aktif atau `null`.
+- Realisasi legacy `0` menjadi belum dilaporkan (`null`), tahap `Selesai` menjadi `IN_REVIEW`, dan checklist lama menjadi `LEGACY_CONFIRMED`.
+- Commit berjalan atomik per proyek, memvalidasi ulang versi target dan status user, lalu menulis `data_jobs` serta audit.
+- Ledger `project_workspace_imports` menjamin idempotensi dengan key `project-workspace-import:{sourceHash}:{legacyId}`.
 
-## Verifikasi
+## Database
 
-- `npm run typecheck`
-- `npm run lint`
-- `npm test`
-- `npm run test:e2e`
-- `npm run build`
-- `docker compose up -d --build`
+- `0010_colorful_toxin.sql`: tabel dan constraint Ruang Proyek.
+- `0011_many_sister_grimm.sql`: singleton role, lifecycle assignment, dan coherence approval/fase.
+- `0012_sad_hawkeye.sql`: ledger preview dan idempotensi import legacy.
+- Ketiga migration sudah diterapkan pada stack development/UAT.
 
-## Progress 6 November 2026
+## Validasi Terakhir
 
-- Tunnel upstream isolated to a unique private app alias; only Nginx is on shared network.
-- Base Compose disables demo auth and removes published ports. Development overlay binds to localhost and shows HTTP 503 publicly until Google OAuth credentials are set.
-- ClamAV scan blocks uploads before persistence and scans legacy evidence before download. Daily DB/uploads backups verified through isolated restore drill.
-- Added monitored backup/health stack, project comments, notification center, calendar/Gantt, saved filters, bulk actions, and complete reports.
-- Production activation still requires Google OAuth credentials and external notification/monitor provider endpoints. Git initialized and CI workflow added, but no initial commit, remote, or executed remote CI run yet.
+- Domain tests: 31 file, 135/135 lulus.
+- Playwright E2E: 20/20 lulus pada desktop dan mobile, termasuk upload preview JSON legacy nyata.
+- E2E memakai database PostgreSQL sementara yang dibuat, dimigrasikan, di-seed, dan dihapus otomatis tanpa menyentuh UAT.
+- Lint, typecheck, production build, health API, dan `git diff --check` lulus.
+- Runtime development sehat pada `http://localhost:3010`.
 
-## Hardening UAT 6 November 2026
+## Production Tersisa
 
-- Cleanup database sementara scanner selesai; backup production tidak disentuh.
-- Nginx menolak host asing, tidak meneruskan header proto dari klien, dan menyembunyikan readiness API dari publik; rate limit menggunakan IP peer tunnel, bukan header klien.
-- Worker notification mewajibkan signing token bila webhook aktif, mengirim timestamp dan event ID; monitor memeriksa queue macet dan job gagal.
-- Startup production menolak URL OAuth yang bukan HTTPS origin; sesi login maksimal 32 jam.
-- Unit tests 65/65 lulus, lint, typecheck, build Docker lulus; E2E terakhir tercatat passed. Runtime tetap UAT/maintenance dan bukan go-live.
-
+- Handoff `AUTH_GOOGLE_ID` dan `AUTH_GOOGLE_SECRET`, lalu verifikasi login production.
+- Isi endpoint email, WhatsApp, dan monitoring sesuai provider.
+- Lakukan dry-run terhadap export legacy asli, rekonsiliasi jumlah proyek/HPP/tahap/dokumen, lalu commit setelah persetujuan Admin.
+- Belum ada commit Git untuk perubahan implementasi ini.

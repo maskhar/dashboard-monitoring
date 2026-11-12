@@ -3,9 +3,9 @@
 import { Activity, CheckCircle2 } from "lucide-react";
 
 export type Viewer = { id: string; role: "ADMIN" | "STAFF"; name?: string | null; email?: string | null };
-export type Section = "overview" | "projects" | "tasks" | "operations" | "approvals" | "audit" | "users";
+export type Section = "overview" | "projects" | "tasks" | "operations" | "approvals" | "imports" | "audit" | "users";
 export type User = { id: string; name: string; email: string; role: "ADMIN" | "STAFF"; status: "INVITED" | "ACTIVE" | "SUSPENDED"; phone: string | null };
-export type Project = { id: string; code: string; brand: string; program: string | null; category: string | null; startDate?: string | null; dueDate: string | null; progress: number; status: string; notes?: string | null; version: number; archivedAt?: string | null; deletedAt?: string | null; assignee: { id: string; name: string } | null };
+export type Project = { id: string; code: string; brand: string; program: string | null; category: string | null; startDate?: string | null; dueDate: string | null; progress: number; status: string; notes?: string | null; version: number; assignmentVersion?: number; archivedAt?: string | null; deletedAt?: string | null; assignee: { id: string; name: string } | null };
 export type Task = { id: string; title: string; description: string | null; dueDate: string | null; projectId: string | null; assigneeId: string | null; status: string; progress: number; version: number; archivedAt?: string | null; deletedAt?: string | null; project?: { id: string; code: string; brand: string } | null; assignee?: { id: string; name: string } | null };
 export type AuditEvent = { id: string; actorName: string | null; action: string; entityType: string; entityId: string | null; result: string; createdAt: string };
 export type Approval = { id: string; entityType: string; entityId: string; approvalType: string; status: string; requestedBy: string; requester?: { id: string; name: string } | null; submittedSnapshot: Record<string, unknown>; baseVersion: number; submittedAt: string };

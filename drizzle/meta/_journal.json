@@ -71,6 +71,27 @@
       "when": 1794030134164,
       "tag": "0009_redundant_purifiers",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794059384773,
+      "tag": "0010_colorful_toxin",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794105463815,
+      "tag": "0011_many_sister_grimm",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794107318390,
+      "tag": "0012_sad_hawkeye",
+      "breakpoints": true
     }
   ]
 }

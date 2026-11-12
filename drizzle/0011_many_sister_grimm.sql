@@ -1,0 +1,13 @@
+CREATE UNIQUE INDEX "project_active_singleton_role_uq" ON "project_assignments" USING btree ("project_id","role") WHERE "project_assignments"."active" = true and "project_assignments"."role" in ('PIC', 'PIC_ASSISTANT', 'DESIGNER', 'PROJECT_LEADER', 'FINANCE_ADMIN');--> statement-breakpoint
+ALTER TABLE "approvals" ADD CONSTRAINT "approvals_base_version_positive" CHECK ("approvals"."base_version" > 0);--> statement-breakpoint
+ALTER TABLE "approvals" ADD CONSTRAINT "approvals_project_phase_type_coherence" CHECK (("approvals"."entity_type" = 'PROJECT_PHASE') = ("approvals"."approval_type" = 'PROJECT_GATE_APPROVAL'));--> statement-breakpoint
+ALTER TABLE "approvals" ADD CONSTRAINT "approvals_decision_coherence" CHECK (
+    ("approvals"."status" = 'PENDING' and "approvals"."decided_by" is null and "approvals"."decided_at" is null and "approvals"."decision_note" is null)
+    or ("approvals"."status" = 'APPROVED' and "approvals"."decided_by" is not null and "approvals"."decided_at" is not null)
+    or ("approvals"."status" in ('REJECTED', 'REVISION_REQUESTED') and "approvals"."decided_by" is not null and "approvals"."decided_at" is not null and nullif(btrim("approvals"."decision_note"), '') is not null)
+    or ("approvals"."status" = 'CANCELLED' and "approvals"."decided_at" is not null and nullif(btrim("approvals"."decision_note"), '') is not null)
+  );--> statement-breakpoint
+ALTER TABLE "project_assignments" ADD CONSTRAINT "project_assignment_lifecycle" CHECK (("project_assignments"."active" and "project_assignments"."ended_at" is null) or (not "project_assignments"."active" and "project_assignments"."ended_at" is not null));--> statement-breakpoint
+ALTER TABLE "project_phase_instances" ADD CONSTRAINT "project_phase_decision_owner_role" CHECK ("project_phase_instances"."decision_owner_role" in ('PIC', 'PROJECT_LEADER', 'FINANCE_ADMIN'));--> statement-breakpoint
+ALTER TABLE "project_phase_instances" ADD CONSTRAINT "project_phase_pass_metadata_pair" CHECK (("project_phase_instances"."passed_at" is null and "project_phase_instances"."passed_by" is null) or ("project_phase_instances"."passed_at" is not null and "project_phase_instances"."passed_by" is not null));--> statement-breakpoint
+ALTER TABLE "project_phase_instances" ADD CONSTRAINT "project_phase_pass_status_coherence" CHECK (("project_phase_instances"."status" <> 'PASSED' or "project_phase_instances"."passed_at" is not null) and ("project_phase_instances"."passed_at" is null or "project_phase_instances"."status" in ('PASSED', 'REOPENED')));

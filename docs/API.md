@@ -116,6 +116,30 @@ Perubahan role, aktivasi, deaktivasi, dan assignment wajib diaudit. Deaktivasi t
 
 Filter: `status`, `program`, `category`, `assigneeId`, `deadlineFrom`, `deadlineTo`, `overdue`, `dataIssue`, `q`, dan `cursor`.
 
+### Ruang Proyek
+
+Ruang Proyek memakai `projects.id` sebagai identitas dan PostgreSQL sebagai sumber data tunggal. Semua mutation memakai session Auth.js, authorization assignment, audit, dan optimistic version bila endpoint menerima `version`.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| `PATCH` | `/api/projects/{projectId}/assignment` | Ubah PIC legacy dengan body `{ userId, version }`; `version` memakai `assignmentVersion` dari daftar proyek dan mencegah konflik workspace. |
+| `GET` | `/api/projects/{projectId}/workspace` | Snapshot profil, metrics, assignment, fase, tahap, RAB, dan requirement dokumen sesuai scope finansial actor. |
+| `POST` | `/api/projects/{projectId}/workspace` | Inisialisasi 6 fase, 16 tahap, dan 13 requirement; Admin. |
+| `PATCH` | `/api/projects/{projectId}/workspace` | Perbarui profil/komersial atau jalankan action state machine. |
+| `GET/POST` | `/api/projects/{projectId}/cost-items` | Daftar/tambah item RAB untuk role finansial yang diizinkan. |
+| `PATCH/DELETE` | `/api/projects/{projectId}/cost-items/{itemId}` | Ubah/soft-delete item dengan version check. |
+| `PATCH` | `/api/projects/{projectId}/stages/{stageId}` | Ubah PIC, tanggal, status, dan progres tahap. |
+| `POST/PATCH` | `/api/projects/{projectId}/workspace/assignments` | Tambah atau ganti assignment tujuh role proyek; Admin. |
+| `DELETE` | `/api/projects/{projectId}/workspace/assignments/{assignmentId}` | Nonaktifkan assignment; Admin. |
+| `POST` | `/api/projects/{projectId}/documents/{requirementId}/attachment` | Upload evidence melalui signature validation dan ClamAV. |
+| `POST` | `/api/projects/{projectId}/documents/{requirementId}/review` | Accept, reject, atau waive sesuai role keputusan. |
+| `POST` | `/api/projects/{projectId}/documents/{requirementId}/reset` | Reset requirement accepted agar evidence dapat diganti secara eksplisit. |
+| `POST` | `/api/projects/{projectId}/phases/{phaseId}/submit` | Ajukan fase `READY` untuk keputusan. |
+| `POST` | `/api/projects/{projectId}/phases/{phaseId}/decision` | Approve/reject fase pending; Admin. |
+| `POST` | `/api/projects/{projectId}/phases/{phaseId}/reopen` | Buka kembali fase passed dengan alasan; Admin. |
+
+Response workspace meredaksi kontrak, margin, pajak, metrics finansial, dan cost items untuk anggota yang bukan Admin, PIC, Project Leader, atau Finance Admin. Proyek terarsip tetap dapat dibaca sesuai scope tetapi seluruh mutation ditolak.
+
 ```json
 {
   "progress": 75,
@@ -231,3 +255,15 @@ Terapkan rate limit berbeda untuk login, upload, import, export, report, dan web
 | `GET` | `/api/evidence/{id}` | Unduh file setelah authorization server-side |
 | `GET` | `/api/attachments?entityType=PROJECT|TASK&entityId={uuid}` | Daftar link Google Drive/eksternal |
 | `POST` | `/api/attachments` | Tambah link `http`/`https`; aktivitas dicatat di audit log |
+
+### Legacy Ruang Proyek Import
+
+`POST /api/projects/workspace-imports` hanya untuk Admin dan menerima multipart:
+
+- `action=preview`: unggah `file`, lalu opsional `projectMapping` dan `userMapping` JSON untuk dry-run terikat versi.
+- `action=commit`: unggah file yang sama beserta mapping dan `previewId` per proyek.
+- Batas file 5 MiB dan maksimal 500 proyek. Production reverse proxy membatasi total multipart request ke 6 MiB. File sumber tidak disimpan; server hanya menyimpan SHA-256, ledger, ringkasan, dan audit.
+- Proyek baru wajib memakai kode `DP-*`. Target yang sudah memiliki workspace tidak dapat ditimpa kecuali replay idempotent persis.
+- Nama user harus dipetakan eksplisit ke user aktif atau `null`; nama ambigu tidak dipilih otomatis.
+- Realisasi legacy `0` menjadi `null`, tahap `Selesai` menjadi `IN_REVIEW`, dan checklist `true` menjadi `LEGACY_CONFIRMED`.
+- Commit memvalidasi ulang versi proyek, status user, mapping hash, dan masa berlaku preview. Perubahan stale menghasilkan `409`.

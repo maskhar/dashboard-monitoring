@@ -121,7 +121,7 @@ npm run build
 npm run start
 npm run typecheck
 npm test
-npm run test:e2e
+npm run test:e2e # memakai database sementara; akun PostgreSQL perlu izin CREATE/DROP DATABASE
 npm run monitor
 ```
 
@@ -138,6 +138,7 @@ Suite test domain tersedia melalui `npm test`. Strategi dan quality gate lengkap
 - [Database](docs/DATABASE.md): model data, integritas, transaksi, dan retensi.
 - [Architecture Decision Records](docs/ADR.md): keputusan dan trade-off arsitektur.
 - [Roadmap Pengembangan](docs/ROADMAP.md): urutan epic, dependency, acceptance criteria, dan sprint.
+- [Rancangan Integrasi Ruang Proyek](docs/PROJECT_ROOM_INTEGRATION_DESIGN.md): penyatuan fitur HPP, fase, tahap, tim, dan dokumen proyek ke sistem PostgreSQL yang berjalan.
 
 ## Prinsip Operasi
 
@@ -152,3 +153,5 @@ Suite test domain tersedia melalui `npm test`. Strategi dan quality gate lengkap
 Proyek internal Utero. Hak penggunaan dan distribusi mengikuti kebijakan organisasi Utero.
 
 
+
+- Import JSON legacy tersedia untuk Admin dengan preview, mapping, dry-run, dan idempotensi.

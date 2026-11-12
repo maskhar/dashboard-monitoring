@@ -5,7 +5,7 @@ vi.mock("../../src/lib/server/projects", () => ({ listProjects: mocks.listProjec
 import { listAllReportProjects, parseReportFilters, projectReportSummary, projectsPdf, projectsWorkbook } from "../../src/lib/server/reports";
 
 const actor = { id: "viewer", role: "ADMIN" as const };
-const row = (index: number, overrides = {}) => ({ id: String(index), code: `DP-${String(index).padStart(3, "0")}`, brand: `Brand ${index}`, program: null, category: null, status: "IN_PROGRESS" as const, progress: 50, startDate: null, dueDate: null, publishedAt: null, notes: null, version: 1, archivedAt: null, deletedAt: null, createdAt: new Date(), updatedAt: new Date(), assignee: null, ...overrides });
+const row = (index: number, overrides = {}) => ({ id: String(index), code: `DP-${String(index).padStart(3, "0")}`, brand: `Brand ${index}`, program: null, category: null, status: "IN_PROGRESS" as const, progress: 50, startDate: null, dueDate: null, publishedAt: null, notes: null, version: 1, assignmentVersion: 1, archivedAt: null, deletedAt: null, createdAt: new Date(), updatedAt: new Date(), assignee: null, ...overrides });
 
 beforeEach(() => { vi.clearAllMocks(); mocks.listProjects.mockResolvedValue([]); });
 describe("complete project reporting", () => {

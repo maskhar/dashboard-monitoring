@@ -21,8 +21,9 @@ test("Admin melihat kontrol tambah dan form tugas", async ({ page, isMobile }) =
   const addButton = page.getByRole("button", { name: "Tambah Tugas" });
   await expect(addButton).toBeVisible();
   await addButton.click();
-  await expect(page.getByRole("heading", { name: "Tambah tugas" })).toBeVisible();
-  await expect(page.getByLabel("Judul")).toBeVisible();
+  const form = page.locator("form").filter({ has: page.getByRole("heading", { name: "Tambah tugas" }) });
+  await expect(form).toBeVisible();
+  await expect(form.getByLabel("Judul")).toBeVisible();
   await expect(page.getByLabel("Tampilan tugas")).toBeVisible();
 });
 

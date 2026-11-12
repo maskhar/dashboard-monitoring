@@ -14,7 +14,7 @@
     "db:seed": "tsx scripts/seed.ts",
     "notifications:worker": "tsx scripts/notification-worker.ts",
     "monitor": "tsx scripts/monitor.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "tsx scripts/e2e/run.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

@@ -19,14 +19,17 @@ test("fitur production proyek, jadwal, filter dan notifikasi tersedia", async ({
   await page.keyboard.press("Escape");
 
   await navigate(page, "Proyek Desain", isMobile);
-  await page.getByRole("button", { name: "Detail", exact: true }).first().click();
+  await page.getByRole("button", { name: "Detail", exact: true }).filter({ visible: true }).first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(page.getByLabel("Komentar proyek")).toBeVisible();
   await page.getByLabel("Tutup detail proyek").click();
-  await page.getByLabel("Pilih semua proyek terlihat").check();
+  const selection = isMobile
+    ? page.getByRole("checkbox", { name: /^Pilih DP-/ }).filter({ visible: true }).first()
+    : page.getByLabel("Pilih semua proyek terlihat");
+  await selection.check();
   await expect(page.getByRole("combobox", { name: "Aksi bulk proyek" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Terapkan" })).toBeEnabled();
-  await page.getByLabel("Pilih semua proyek terlihat").uncheck();
+  await selection.uncheck();
 
   await navigate(page, "Operasional", isMobile);
   await expect(page.getByRole("heading", { name: "Kalender & Gantt" })).toBeVisible();

@@ -42,6 +42,8 @@ docker compose ps
 
 Application entrypoint and host port depend on Compose/reverse-proxy wiring. Containers connect internally through service DNS names.
 
+Production Nginx limits `/api/projects/workspace-imports` request bodies to 6 MiB, leaving multipart overhead above the application's 5 MiB JSON file limit. Keep an equivalent request-body limit when replacing the bundled reverse proxy.
+
 Check health and logs:
 
 ```sh

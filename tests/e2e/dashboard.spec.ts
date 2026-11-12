@@ -17,9 +17,20 @@ async function navigate(page: import("@playwright/test").Page, name: string, isM
 test("Admin melihat data template dan menu kontrol", async ({ page, isMobile }) => {
   await login(page, "admin@utero.local", "admin123");
   await navigate(page, "Proyek Desain", isMobile);
-  await expect(page.getByText("65 proyek", { exact: true })).toBeVisible();
+  const projects = await page.request.get("/api/projects?limit=100").then((response) => response.json()) as { data: unknown[] };
+  await expect(page.getByText(`${projects.data.length} proyek`, { exact: true })).toBeVisible();
   await navigate(page, "Operasional", isMobile);
   await expect(page.getByRole("tab", { name: "Program 3 Bulan" })).toBeVisible();
+  await navigate(page, "Migrasi Legacy", isMobile);
+  await expect(page.getByRole("heading", { name: "Importer ruang proyek legacy" })).toBeVisible();
+  await page.getByLabel("Pilih berkas JSON legacy").setInputFiles({
+    name: "legacy-e2e.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify({ "legacy-e2e": { nama: "Proyek Legacy E2E" } })),
+  });
+  await page.getByRole("button", { name: "Preview di server" }).click();
+  await expect(page.getByText("Mapping proyek")).toBeVisible();
+  await expect(page.getByLabel("Kode proyek baru Proyek Legacy E2E")).toBeVisible();
   await navigate(page, "Pengguna", isMobile);
   await expect(page.getByRole("heading", { name: "Pengguna dan role" })).toBeVisible();
   await navigate(page, "Riwayat", isMobile);
@@ -31,6 +42,7 @@ test("Staff hanya melihat menu dan data scoped", async ({ page, isMobile }) => {
   if (isMobile) await page.getByRole("button", { name: "Buka navigasi" }).click();
   await expect(page.getByRole("button", { name: "Pengajuan Saya" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Pengguna" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Migrasi Legacy" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Riwayat" })).toHaveCount(0);
   await expect(page.getByText("Dalam assignment Anda")).toBeVisible();
 });

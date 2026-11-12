@@ -24,14 +24,15 @@ test("Admin dapat membuka form proyek lengkap dan mengirim payload create", asyn
     await route.fulfill({ status: 201, contentType: "application/json", body: "{}" });
   });
   await page.getByRole("button", { name: "Tambah Proyek/Desain" }).click();
-  await page.getByLabel("Kode").fill("DP-999");
-  await page.getByLabel("Brand").fill("Brand Uji");
-  await page.getByRole("textbox", { name: "Program", exact: true }).fill("Program Uji");
-  await page.getByLabel("Kategori").fill("Digital");
-  await page.getByLabel("Mulai").fill("2026-11-01");
-  await page.getByRole("textbox", { name: "Deadline", exact: true }).fill("2026-11-30");
-  await page.getByRole("textbox", { name: "Catatan", exact: true }).fill("Catatan uji");
-  await page.getByRole("button", { name: "Tambah proyek", exact: true }).click();
+  const form = page.locator("form").filter({ has: page.getByRole("heading", { name: "Tambah proyek desain" }) });
+  await form.getByLabel("Kode").fill("DP-999");
+  await form.getByLabel("Brand").fill("Brand Uji");
+  await form.getByRole("textbox", { name: "Program", exact: true }).fill("Program Uji");
+  await form.getByLabel("Kategori").fill("Digital");
+  await form.getByLabel("Mulai").fill("2026-11-01");
+  await form.getByRole("textbox", { name: "Deadline", exact: true }).fill("2026-11-30");
+  await form.getByRole("textbox", { name: "Catatan", exact: true }).fill("Catatan uji");
+  await form.getByRole("button", { name: "Tambah proyek", exact: true }).click();
   await expect.poll(() => payload).toMatchObject({ code: "DP-999", brand: "Brand Uji", program: "Program Uji", category: "Digital", startDate: "2026-11-01", dueDate: "2026-11-30", notes: "Catatan uji" });
 });
 
@@ -40,10 +41,11 @@ test("Admin melihat management operasional sesuai tab dan staff tidak", async ({
   await navigate(page, "Operasional", isMobile);
   await page.getByRole("tab", { name: "Program 3 Bulan" }).click();
   await page.getByRole("button", { name: "Tambah", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Tambah Program 3 Bulan" })).toBeVisible();
-  await expect(page.getByRole("spinbutton", { name: "Minggu", exact: true })).toBeVisible();
-  await expect(page.getByLabel("Fokus")).toBeVisible();
-  await expect(page.getByLabel("Deliverable")).toBeVisible();
+  const form = page.locator("form").filter({ has: page.getByRole("heading", { name: "Tambah Program 3 Bulan" }) });
+  await expect(form).toBeVisible();
+  await expect(form.getByRole("spinbutton", { name: "Minggu", exact: true })).toBeVisible();
+  await expect(form.getByLabel("Fokus")).toBeVisible();
+  await expect(form.getByLabel("Deliverable")).toBeVisible();
   await expect(page.getByRole("button", { name: "Arsip", exact: true }).first()).toBeVisible();
   await expect(page.getByRole("button", { name: "Hapus", exact: true }).first()).toBeVisible();
 
